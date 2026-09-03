@@ -34,16 +34,16 @@ export function RecoveryQueuePage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Recovery Queue</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Recovery Queue</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
             Active failed transactions categorized by recoverability feasibility and policy clearance
           </p>
         </div>
         <button
           onClick={fetchCases}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium transition self-start"
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Queue</span>
@@ -55,7 +55,7 @@ export function RecoveryQueuePage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+          className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
         >
           <option value="">All Lifecycle States</option>
           <option value="PENDING_ANALYSIS">Pending Analysis</option>
@@ -70,7 +70,7 @@ export function RecoveryQueuePage() {
         <select
           value={tierFilter}
           onChange={(e) => setTierFilter(e.target.value)}
-          className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+          className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
         >
           <option value="">All Recoverability Tiers</option>
           <option value="HIGH">High Feasibility</option>
@@ -81,11 +81,11 @@ export function RecoveryQueuePage() {
       </div>
 
       {/* Queue Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 text-slate-400 font-medium font-mono text-[11px] bg-slate-950/40">
+              <tr className="border-b border-slate-200 text-slate-500 font-medium font-mono text-[11px] bg-slate-50/70">
                 <th className="py-3 px-6">CASE ID</th>
                 <th className="py-3 px-4">PAYMENT REF</th>
                 <th className="py-3 px-4">AMOUNT</th>
@@ -96,7 +96,7 @@ export function RecoveryQueuePage() {
                 <th className="py-3 px-6 text-right">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+            <tbody className="divide-y divide-slate-100 font-mono">
               {cases.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="py-12 text-center text-slate-500 text-xs font-sans">
@@ -109,30 +109,30 @@ export function RecoveryQueuePage() {
                   const rec = c.latestDecisionId?.parsedRecommendation;
 
                   return (
-                    <tr key={c._id} className="hover:bg-slate-850/50 transition">
-                      <td className="py-3.5 px-6 font-bold text-white">
+                    <tr key={c._id} className="hover:bg-slate-50/80 transition">
+                      <td className="py-3.5 px-6 font-bold text-slate-900">
                         {c.caseId}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-slate-300">
+                      <td className="py-3.5 px-4 font-mono text-slate-700">
                         {p.paymentId || '—'}
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-white">
+                      <td className="py-3.5 px-4 font-semibold text-slate-900">
                         {formatINR(p.amount)}
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center space-x-1.5">
                           <Badge variant={c.recoverabilityTier}>{c.recoverabilityTier || 'PENDING'}</Badge>
                           {c.recoverabilityScore !== null && (
-                            <span className="text-[10px] text-slate-400">
+                            <span className="text-[10px] text-slate-500">
                               {formatConfidence(c.recoverabilityScore)}
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-300 font-sans">
+                      <td className="py-3.5 px-4 text-slate-700 font-sans">
                         {rec?.recommendedStrategy?.replace(/_/g, ' ') || 'Awaiting Analysis'}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-300">
+                      <td className="py-3.5 px-4 text-slate-700">
                         {c.attemptCount} / {c.maxAttemptsAllowed}
                       </td>
                       <td className="py-3.5 px-4">
@@ -143,7 +143,7 @@ export function RecoveryQueuePage() {
                       <td className="py-3.5 px-6 text-right">
                         <Link
                           to={`/recovery/${c.caseId}`}
-                          className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 border border-brand-500/30 rounded font-semibold transition"
+                          className="inline-flex items-center space-x-1 text-xs px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded font-semibold transition"
                         >
                           <span>Inspect</span>
                           <ArrowUpRight className="w-3.5 h-3.5" />

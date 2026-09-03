@@ -4,6 +4,8 @@ import { api } from '../../../services/api.js';
 import { formatDate } from '../../../utils/formatters.js';
 import { Badge } from '../../../components/ui/Badge.jsx';
 
+import { sanitizeSearchQuery } from '../../../validation/index.js';
+
 export function AuditPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,8 @@ export function AuditPage() {
       setLoading(true);
       const params = new URLSearchParams();
       if (eventTypeFilter) params.append('eventType', eventTypeFilter);
-      if (entityFilter) params.append('entityId', entityFilter);
+      const sanitized = sanitizeSearchQuery(entityFilter, 100);
+      if (sanitized) params.append('entityId', sanitized);
       params.append('limit', '50');
 
       const res = await api.get(`/audit?${params.toString()}`);
@@ -42,16 +45,16 @@ export function AuditPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Audit & Governance Ledger</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Audit & Governance Ledger</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
             Immutable, append-only operational log recording every state transition, decision & gateway call
           </p>
         </div>
         <button
           onClick={fetchAuditEvents}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium transition self-start"
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Ledger</span>
@@ -63,55 +66,48 @@ export function AuditPage() {
         <select
           value={eventTypeFilter}
           onChange={(e) => setEventTypeFilter(e.target.value)}
-          className="px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+          className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-indigo-500"
         >
-          <option value="">All Operational Event Types</option>
-          <option value="PAYMENT_RECEIVED">PAYMENT_RECEIVED</option>
-          <option value="PAYMENT_FAILED">PAYMENT_FAILED</option>
-          <option value="RECOVERY_CASE_CREATED">RECOVERY_CASE_CREATED</option>
-          <option value="AI_ANALYSIS_STARTED">AI_ANALYSIS_STARTED</option>
-          <option value="AI_ANALYSIS_COMPLETED">AI_ANALYSIS_COMPLETED</option>
-          <option value="AI_ANALYSIS_FAILED">AI_ANALYSIS_FAILED</option>
-          <option value="POLICY_EVALUATED">POLICY_EVALUATED</option>
-          <option value="ACTION_BLOCKED">ACTION_BLOCKED</option>
-          <option value="APPROVAL_REQUESTED">APPROVAL_REQUESTED</option>
-          <option value="ACTION_APPROVED">ACTION_APPROVED</option>
-          <option value="ACTION_EXECUTED">ACTION_EXECUTED</option>
-          <option value="WEBHOOK_RECEIVED">WEBHOOK_RECEIVED</option>
-          <option value="WEBHOOK_DUPLICATE_DROPPED">WEBHOOK_DUPLICATE_DROPPED</option>
+          <option value="">All Event Categories</option>
+          <option value="RECOVERY_CASE_CREATED">Case Created</option>
+          <option value="AI_ANALYSIS_COMPLETED">AI Analysis Completed</option>
+          <option value="POLICY_EVALUATED">Policy Evaluated</option>
+          <option value="ACTION_EXECUTED">Action Executed</option>
+          <option value="APPROVAL_REQUESTED">Approval Requested</option>
+          <option value="APPROVAL_RESOLVED">Approval Resolved</option>
+          <option value="ACTION_BLOCKED">Action Blocked</option>
         </select>
 
-        <div className="relative">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-          <input
-            type="text"
-            placeholder="Filter by Entity ID (Payment ID, Case ID, Action ID)..."
-            value={entityFilter}
-            onChange={(e) => setEntityFilter(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Filter by Entity Reference (Case ID, Payment ID)..."
+          value={entityFilter}
+          maxLength={100}
+          aria-label="Filter by Entity Reference"
+          onChange={(e) => setEntityFilter(e.target.value)}
+          className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500"
+        />
       </div>
 
-      {/* Ledger Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+      {/* Audit Log Table */}
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 text-slate-400 font-medium font-mono text-[11px] bg-slate-950/40">
+              <tr className="border-b border-slate-200 text-slate-500 font-medium font-mono text-[11px] bg-slate-50/70">
                 <th className="py-3 px-4 w-8"></th>
                 <th className="py-3 px-4">EVENT TYPE</th>
                 <th className="py-3 px-4">ENTITY</th>
                 <th className="py-3 px-4">ACTOR</th>
-                <th className="py-3 px-4">CORRELATION TRACE ID</th>
+                <th className="py-3 px-4">TRACE / REQUEST ID</th>
                 <th className="py-3 px-6 text-right">TIMESTAMP</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+            <tbody className="divide-y divide-slate-100 font-mono">
               {events.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="py-12 text-center text-slate-500 text-xs font-sans">
-                    {loading ? 'Reading audit trail...' : 'No audit events found.'}
+                    {loading ? 'Retrieving audit events...' : 'No ledger events match the specified criteria.'}
                   </td>
                 </tr>
               ) : (
@@ -122,37 +118,42 @@ export function AuditPage() {
                     <React.Fragment key={evt.eventId}>
                       <tr 
                         onClick={() => toggleRow(evt.eventId)}
-                        className="hover:bg-slate-850/50 cursor-pointer transition"
+                        className="hover:bg-slate-50/80 transition cursor-pointer"
                       >
-                        <td className="py-3 px-4 text-slate-500">
+                        <td className="py-3.5 px-4 text-slate-400">
                           {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                         </td>
-                        <td className="py-3 px-4 font-bold text-white">
-                          <span className="text-brand-300">{evt.eventType}</span>
+                        <td className="py-3.5 px-4 font-bold text-slate-900">
+                          <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200 text-[11px]">
+                            {evt.eventType}
+                          </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-300">
-                          <span className="text-[10px] text-slate-400 block">{evt.entityType}:</span>
-                          {evt.entityId}
+                        <td className="py-3.5 px-4 text-slate-700">
+                          <span className="text-slate-500 font-sans text-[11px] block">{evt.entityType}</span>
+                          <span className="font-semibold text-slate-900">{evt.entityId}</span>
                         </td>
-                        <td className="py-3 px-4 text-slate-300">
-                          {evt.actor?.type} {evt.actor?.id ? `(${evt.actor.id})` : ''}
+                        <td className="py-3.5 px-4 text-slate-600 font-sans text-[11px]">
+                          {evt.actor?.type}
+                          <span className="text-slate-400 font-mono block text-[10px]">{evt.actor?.id}</span>
                         </td>
-                        <td className="py-3 px-4 text-slate-400 text-[11px]">
+                        <td className="py-3.5 px-4 text-slate-500 font-mono text-[11px]">
                           {evt.requestId ? evt.requestId.slice(0, 16) : '—'}
                         </td>
-                        <td className="py-3 px-6 text-right text-slate-400 text-[11px]">
+                        <td className="py-3.5 px-6 text-right text-slate-500 font-sans text-[11px]">
                           {formatDate(evt.timestamp)}
                         </td>
                       </tr>
+
+                      {/* Expandable JSON Payload Drawer */}
                       {isExpanded && (
-                        <tr className="bg-slate-950/80">
-                          <td colSpan="6" className="px-8 py-3">
-                            <div className="p-3 bg-slate-900 border border-slate-800 rounded-lg space-y-1 text-[11px]">
-                              <div className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
-                                Sanitized Audit Delta Payload:
-                              </div>
-                              <pre className="text-emerald-400 overflow-x-auto whitespace-pre-wrap break-all">
-                                {JSON.stringify(evt.payload, null, 2)}
+                        <tr className="bg-slate-50/90 border-b border-slate-200">
+                          <td colSpan="6" className="p-4 px-8">
+                            <div className="space-y-1">
+                              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
+                                Immutable Event Payload
+                              </span>
+                              <pre className="p-3 bg-white border border-slate-200 rounded-lg text-slate-800 font-mono text-[11px] overflow-x-auto">
+                                {JSON.stringify(evt.payload || {}, null, 2)}
                               </pre>
                             </div>
                           </td>

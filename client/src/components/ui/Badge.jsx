@@ -2,37 +2,37 @@ import React from 'react';
 
 const VARIANT_MAP = {
   // Status / Outcomes
-  'CAPTURED': 'bg-emerald-950/70 text-emerald-400 border-emerald-800/80',
-  'RECOVERED': 'bg-emerald-950/70 text-emerald-400 border-emerald-800/80',
-  'SUCCESS': 'bg-emerald-950/70 text-emerald-400 border-emerald-800/80',
-  'ALLOW': 'bg-emerald-950/70 text-emerald-400 border-emerald-800/80',
-  'HIGH': 'bg-emerald-950/70 text-emerald-400 border-emerald-800/80',
+  'CAPTURED': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'RECOVERED': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'SUCCESS': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'ALLOW': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  'HIGH': 'bg-emerald-50 text-emerald-700 border-emerald-200',
 
   // In Flight / Processing
-  'IN_FLIGHT': 'bg-blue-950/70 text-blue-400 border-blue-800/80',
-  'ANALYZED': 'bg-blue-950/70 text-blue-400 border-blue-800/80',
-  'EXECUTING': 'bg-blue-950/70 text-blue-400 border-blue-800/80',
-  'MEDIUM': 'bg-blue-950/70 text-blue-400 border-blue-800/80',
+  'IN_FLIGHT': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  'ANALYZED': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  'EXECUTING': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  'MEDIUM': 'bg-indigo-50 text-indigo-700 border-indigo-200',
 
   // Attention / Approvals
-  'PENDING': 'bg-amber-950/70 text-amber-400 border-amber-800/80',
-  'PENDING_ANALYSIS': 'bg-amber-950/70 text-amber-400 border-amber-800/80',
-  'APPROVAL_REQUIRED': 'bg-amber-950/70 text-amber-400 border-amber-800/80',
-  'REQUIRE_APPROVAL': 'bg-amber-950/70 text-amber-400 border-amber-800/80',
-  'PENDING_APPROVAL': 'bg-amber-950/70 text-amber-400 border-amber-800/80',
+  'PENDING': 'bg-amber-50 text-amber-800 border-amber-200',
+  'PENDING_ANALYSIS': 'bg-amber-50 text-amber-800 border-amber-200',
+  'APPROVAL_REQUIRED': 'bg-amber-50 text-amber-800 border-amber-200',
+  'REQUIRE_APPROVAL': 'bg-amber-50 text-amber-800 border-amber-200',
+  'PENDING_APPROVAL': 'bg-amber-50 text-amber-800 border-amber-200',
 
   // Failures / Blocked
-  'FAILED': 'bg-rose-950/70 text-rose-400 border-rose-800/80',
-  'BLOCK': 'bg-rose-950/70 text-rose-400 border-rose-800/80',
-  'BLOCKED': 'bg-rose-950/70 text-rose-400 border-rose-800/80',
-  'REJECTED': 'bg-rose-950/70 text-rose-400 border-rose-800/80',
-  'EXHAUSTED': 'bg-rose-950/70 text-rose-400 border-rose-800/80',
-  'CLOSED_UNRECOVERABLE': 'bg-slate-900 text-slate-400 border-slate-700',
-  'LOW': 'bg-slate-900 text-slate-400 border-slate-700',
-  'NONE': 'bg-slate-900 text-slate-500 border-slate-800',
+  'FAILED': 'bg-rose-50 text-rose-700 border-rose-200',
+  'BLOCK': 'bg-rose-50 text-rose-700 border-rose-200',
+  'BLOCKED': 'bg-rose-50 text-rose-700 border-rose-200',
+  'REJECTED': 'bg-rose-50 text-rose-700 border-rose-200',
+  'EXHAUSTED': 'bg-rose-50 text-rose-700 border-rose-200',
+  'CLOSED_UNRECOVERABLE': 'bg-slate-100 text-slate-700 border-slate-200',
+  'LOW': 'bg-slate-100 text-slate-700 border-slate-200',
+  'NONE': 'bg-slate-100 text-slate-500 border-slate-200',
 
   // Neutral
-  'DEFAULT': 'bg-slate-900/80 text-slate-300 border-slate-700'
+  'DEFAULT': 'bg-slate-100 text-slate-700 border-slate-200'
 };
 
 export function Badge({ children, variant, className = '' }) {
@@ -40,7 +40,7 @@ export function Badge({ children, variant, className = '' }) {
   const colorClasses = VARIANT_MAP[normalizedKey] || VARIANT_MAP['DEFAULT'];
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border font-mono tracking-tight ${colorClasses} ${className}`}>
+    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border font-mono tracking-tight shadow-xs ${colorClasses} ${className}`}>
       {children}
     </span>
   );

@@ -1,20 +1,19 @@
 import { RecoveryService } from './recovery.service.js';
+import { listCasesQuerySchema, caseIdParamSchema } from './recovery.validation.js';
 import { sendSuccess } from '../../utils/response.js';
 
 export class RecoveryController {
   static async listCases(req, res, next) {
     try {
-      const page = parseInt(req.query.page || '1', 10);
-      const limit = parseInt(req.query.limit || '20', 10);
-      const { status, priority, tier } = req.query;
+      const validatedQuery = listCasesQuerySchema.parse(req.query);
 
       const result = await RecoveryService.listCases({
         merchantId: req.user?.merchantId,
-        status,
-        priority,
-        tier,
-        page,
-        limit
+        status: validatedQuery.status,
+        priority: validatedQuery.priority,
+        tier: validatedQuery.tier,
+        page: validatedQuery.page,
+        limit: validatedQuery.limit
       });
 
       return sendSuccess(res, result);
@@ -25,7 +24,7 @@ export class RecoveryController {
 
   static async getCase(req, res, next) {
     try {
-      const { id } = req.params;
+      const { id } = caseIdParamSchema.parse(req.params);
       const caseDetail = await RecoveryService.getCaseDetail(id);
       return sendSuccess(res, { recoveryCase: caseDetail });
     } catch (err) {
@@ -35,7 +34,7 @@ export class RecoveryController {
 
   static async analyzeCase(req, res, next) {
     try {
-      const { id } = req.params;
+      const { id } = caseIdParamSchema.parse(req.params);
       const options = req.body || {};
 
       const result = await RecoveryService.processRecoveryCase(

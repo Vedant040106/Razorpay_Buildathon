@@ -10,13 +10,15 @@ RecoverAI is an enterprise-grade AI revenue recovery platform built for merchant
 
 ```mermaid
 flowchart TB
-    subgraph ClientLayer["Merchant Console (React + Vite + Tailwind CSS)"]
-        Dashboard["Operations Dashboard"]
-        Queue["Recovery Queue"]
-        Detail["Recovery Case View"]
-        Approvals["Human Approval Inbox"]
-        Analytics["Recovery Analytics"]
-        AuditView["Audit Trail Explorer"]
+    subgraph ClientLayer["Frontend Application (React + Vite + Tailwind CSS)"]
+        Landing["Public Landing Page (/)"]
+        Login["Merchant Authentication (/login)"]
+        Dashboard["Operations Dashboard (/dashboard)"]
+        Queue["Recovery Queue (/recovery)"]
+        Detail["Recovery Case View (/recovery/:id)"]
+        Approvals["Human Approval Inbox (/approvals)"]
+        Analytics["Recovery Analytics (/analytics)"]
+        AuditView["Audit Trail Explorer (/audit)"]
         SimDrawer["Interactive Demo Simulator"]
     end
 

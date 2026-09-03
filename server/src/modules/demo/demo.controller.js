@@ -1,10 +1,11 @@
 import { DemoService } from './demo.service.js';
+import { simulateScenarioSchema } from './demo.validation.js';
 import { sendSuccess } from '../../utils/response.js';
 
 export class DemoController {
   static async simulate(req, res, next) {
     try {
-      const { scenarioId } = req.params;
+      const { scenarioId } = simulateScenarioSchema.parse(req.params);
       const result = await DemoService.simulateScenario(scenarioId, req.user?.merchantId);
       return sendSuccess(res, result, 200, {
         message: `Scenario ${scenarioId} executed successfully`

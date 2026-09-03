@@ -40,8 +40,8 @@ export function DashboardPage() {
   if (loading && !metrics) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex items-center space-x-2 text-slate-400 text-sm">
-          <RefreshCw className="w-4 h-4 animate-spin text-brand-500" />
+        <div className="flex items-center space-x-2 text-slate-500 text-xs font-mono">
+          <RefreshCw className="w-4 h-4 animate-spin text-indigo-600" />
           <span>Loading merchant recovery metrics...</span>
         </div>
       </div>
@@ -54,17 +54,17 @@ export function DashboardPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Top Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Revenue Recovery Console</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Revenue Recovery Console</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
             Autonomous failure analysis, deterministic policy gating & Razorpay recovery
           </p>
         </div>
         <div className="flex items-center space-x-3">
           <button
             onClick={fetchData}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium transition"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Refresh</span>
@@ -75,60 +75,60 @@ export function DashboardPage() {
       {/* Metric Cards Ribbon */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Failed Volume */}
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span>Failed Payment Volume</span>
-            <AlertCircle className="w-4 h-4 text-rose-400" />
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-medium">Failed Payment Volume</span>
+            <AlertCircle className="w-4 h-4 text-rose-500" />
           </div>
-          <div className="text-2xl font-extrabold text-white font-mono tracking-tight">
+          <div className="text-2xl font-extrabold text-slate-900 font-mono tracking-tight">
             {formatINR(financials.failedVolumePaise)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Across <span className="text-slate-200 font-semibold">{counts.failedPaymentsCount}</span> failed transactions
+          <div className="text-[11px] text-slate-500 mt-1">
+            Across <span className="text-slate-800 font-semibold">{counts.failedPaymentsCount}</span> failed transactions
           </div>
         </div>
 
         {/* Recoverable Opportunity */}
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span>Recoverable Opportunity</span>
-            <Sparkles className="w-4 h-4 text-brand-400" />
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-medium">Recoverable Opportunity</span>
+            <Sparkles className="w-4 h-4 text-indigo-600" />
           </div>
-          <div className="text-2xl font-extrabold text-brand-400 font-mono tracking-tight">
+          <div className="text-2xl font-extrabold text-indigo-600 font-mono tracking-tight">
             {formatINR(financials.recoverableVolumePaise)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
+          <div className="text-[11px] text-slate-500 mt-1">
             Identified by AI as high/medium feasibility
           </div>
         </div>
 
         {/* Recovered Revenue */}
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span>Successfully Recovered</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-medium">Successfully Recovered</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
-          <div className="text-2xl font-extrabold text-emerald-400 font-mono tracking-tight">
+          <div className="text-2xl font-extrabold text-emerald-600 font-mono tracking-tight">
             {formatINR(financials.recoveredVolumePaise)}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1 flex items-center space-x-1.5">
-            <span className="font-semibold text-emerald-400 font-mono">{financials.recoveryRate}%</span>
+          <div className="text-[11px] text-slate-500 mt-1 flex items-center space-x-1.5">
+            <span className="font-semibold text-emerald-700 font-mono">{financials.recoveryRate}%</span>
             <span>conversion recovery rate</span>
           </div>
         </div>
 
         {/* Pending Approvals */}
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl shadow-sm">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-            <span>Pending Human Approvals</span>
-            <ShieldAlert className="w-4 h-4 text-amber-400" />
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+            <span className="font-medium">Pending Human Approvals</span>
+            <ShieldAlert className="w-4 h-4 text-amber-500" />
           </div>
-          <div className="text-2xl font-extrabold text-amber-400 font-mono tracking-tight">
+          <div className="text-2xl font-extrabold text-amber-600 font-mono tracking-tight">
             {counts.pendingApprovalsCount}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
+          <div className="text-[11px] text-slate-500 mt-1">
             {counts.pendingApprovalsCount > 0 ? (
-              <Link to="/approvals" className="text-amber-400 hover:underline flex items-center space-x-1">
+              <Link to="/approvals" className="text-indigo-600 hover:text-indigo-700 font-semibold flex items-center space-x-1">
                 <span>Review flagged transactions</span>
                 <ArrowUpRight className="w-3 h-3" />
               </Link>
@@ -142,19 +142,19 @@ export function DashboardPage() {
       {/* Analytics Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recovery Trend Area Chart */}
-        <div className="lg:col-span-2 p-5 bg-slate-900 border border-slate-800 rounded-xl">
+        <div className="lg:col-span-2 p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-sm font-semibold text-white">Daily Recovery Velocity</h2>
-              <p className="text-xs text-slate-400">Failed volume vs. recovered volume (in ₹)</p>
+              <h2 className="text-sm font-semibold text-slate-900">Daily Recovery Velocity</h2>
+              <p className="text-xs text-slate-500">Failed volume vs. recovered volume (in ₹)</p>
             </div>
             <div className="flex items-center space-x-3 text-xs font-mono">
-              <span className="flex items-center space-x-1 text-rose-400">
-                <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+              <span className="flex items-center space-x-1 text-rose-600 font-medium">
+                <span className="w-2 h-2 rounded-full bg-rose-500"></span>
                 <span>Failed</span>
               </span>
-              <span className="flex items-center space-x-1 text-emerald-400">
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span className="flex items-center space-x-1 text-emerald-600 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                 <span>Recovered</span>
               </span>
             </div>
@@ -165,27 +165,27 @@ export function DashboardPage() {
               <AreaChart data={metrics?.dailyTrend || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorFailed" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorRecovered" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="date" stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <YAxis 
-                  stroke="#64748b" 
+                  stroke="#94a3b8" 
                   fontSize={11} 
                   tickLine={false} 
                   tickFormatter={(val) => `₹${val / 100000}k`}
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
                   formatter={(val) => [`₹${(val / 100).toLocaleString('en-IN')}`, '']}
                 />
-                <Area type="monotone" dataKey="failed" stroke="#f43f5e" fillOpacity={1} fill="url(#colorFailed)" strokeWidth={2} />
+                <Area type="monotone" dataKey="failed" stroke="#ef4444" fillOpacity={1} fill="url(#colorFailed)" strokeWidth={2} />
                 <Area type="monotone" dataKey="recovered" stroke="#10b981" fillOpacity={1} fill="url(#colorRecovered)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
@@ -193,29 +193,29 @@ export function DashboardPage() {
         </div>
 
         {/* Failure Categories Breakdown */}
-        <div className="p-5 bg-slate-900 border border-slate-800 rounded-xl flex flex-col justify-between">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-white">Failure Root Causes</h2>
-            <p className="text-xs text-slate-400 mb-4">Classified by upstream gateway & AI signals</p>
+            <h2 className="text-sm font-semibold text-slate-900">Failure Root Causes</h2>
+            <p className="text-xs text-slate-500 mb-4">Classified by upstream gateway & AI signals</p>
 
             <div className="space-y-3">
               {(metrics?.failureCategories || []).map((cat) => (
                 <div key={cat.category} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-300 font-medium">
+                    <span className="text-slate-700 font-medium">
                       {cat.category.replace(/_/g, ' ')}
                     </span>
-                    <span className="font-mono text-slate-400">
+                    <span className="font-mono text-slate-500">
                       {cat.count} ({cat.percentage}%)
                     </span>
                   </div>
-                  <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                  <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                     <div 
                       className={`h-full rounded-full ${
-                        cat.category === 'TEMPORARY_NETWORK' ? 'bg-brand-500' :
-                        cat.category === 'AUTHENTICATION_FAILED' ? 'bg-amber-400' :
-                        cat.category === 'INSUFFICIENT_FUNDS' ? 'bg-purple-400' :
-                        cat.category === 'FRAUD_SUSPECTED' ? 'bg-rose-500' : 'bg-slate-500'
+                        cat.category === 'TEMPORARY_NETWORK' ? 'bg-indigo-600' :
+                        cat.category === 'AUTHENTICATION_FAILED' ? 'bg-amber-500' :
+                        cat.category === 'INSUFFICIENT_FUNDS' ? 'bg-indigo-400' :
+                        cat.category === 'FRAUD_SUSPECTED' ? 'bg-rose-500' : 'bg-slate-400'
                       }`}
                       style={{ width: `${Math.max(5, cat.percentage)}%` }}
                     />
@@ -225,22 +225,22 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-slate-800 text-[11px] text-slate-400 leading-relaxed">
-            <span className="text-slate-200 font-semibold">Policy Guard:</span> High-risk fraud & retry-exhausted categories are blocked deterministically.
+          <div className="pt-4 mt-4 border-t border-slate-100 text-[11px] text-slate-500 leading-relaxed">
+            <span className="text-slate-800 font-semibold">Policy Guard:</span> High-risk fraud & retry-exhausted categories are blocked deterministically.
           </div>
         </div>
       </div>
 
       {/* Recent Recovery Cases Quick Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50/50">
           <div>
-            <h2 className="text-sm font-semibold text-white">Recent Recovery Queue Activity</h2>
-            <p className="text-xs text-slate-400">Active payment failures under autonomous analysis</p>
+            <h2 className="text-sm font-semibold text-slate-900">Recent Recovery Queue Activity</h2>
+            <p className="text-xs text-slate-500">Active payment failures under autonomous analysis</p>
           </div>
           <Link
             to="/recovery"
-            className="flex items-center space-x-1 text-xs font-semibold text-brand-400 hover:text-brand-300 transition"
+            className="flex items-center space-x-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition"
           >
             <span>View Full Queue</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -250,7 +250,7 @@ export function DashboardPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 text-slate-400 font-medium font-mono text-[11px]">
+              <tr className="border-b border-slate-200 text-slate-500 font-medium font-mono text-[11px] bg-slate-50/70">
                 <th className="py-3 px-6">CASE ID</th>
                 <th className="py-3 px-4">AMOUNT</th>
                 <th className="py-3 px-4">FAILURE REASON</th>
@@ -260,31 +260,31 @@ export function DashboardPage() {
                 <th className="py-3 px-6 text-right">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+            <tbody className="divide-y divide-slate-100 font-mono">
               {recentCases.map((c) => {
                 const p = c.paymentId || {};
                 const rec = c.latestDecisionId?.parsedRecommendation;
 
                 return (
-                  <tr key={c._id} className="hover:bg-slate-850/50 transition">
-                    <td className="py-3.5 px-6 font-bold text-white">
+                  <tr key={c._id} className="hover:bg-slate-50/80 transition">
+                    <td className="py-3.5 px-6 font-bold text-slate-900">
                       {c.caseId}
                     </td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-200">
+                    <td className="py-3.5 px-4 font-semibold text-slate-800">
                       {formatINR(p.amount)}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-400 font-sans max-w-xs truncate">
+                    <td className="py-3.5 px-4 text-slate-600 font-sans max-w-xs truncate">
                       {p.failureReason || p.failureCategory}
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center space-x-1.5">
                         <Badge variant={c.recoverabilityTier}>{c.recoverabilityTier || 'PENDING'}</Badge>
                         {c.recoverabilityScore !== null && (
-                          <span className="text-[10px] text-slate-400">({formatConfidence(c.recoverabilityScore)})</span>
+                          <span className="text-[10px] text-slate-500 font-mono">({formatConfidence(c.recoverabilityScore)})</span>
                         )}
                       </div>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-300 font-sans">
+                    <td className="py-3.5 px-4 text-slate-700 font-sans">
                       {rec?.recommendedStrategy?.replace(/_/g, ' ') || 'Analyzing...'}
                     </td>
                     <td className="py-3.5 px-4">
@@ -295,7 +295,7 @@ export function DashboardPage() {
                     <td className="py-3.5 px-6 text-right">
                       <Link
                         to={`/recovery/${c.caseId}`}
-                        className="inline-flex items-center space-x-1 text-xs text-brand-400 hover:text-brand-300 font-semibold"
+                        className="inline-flex items-center space-x-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
                       >
                         <span>Inspect</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />

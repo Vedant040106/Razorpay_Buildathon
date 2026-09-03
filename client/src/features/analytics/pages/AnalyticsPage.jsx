@@ -29,8 +29,8 @@ export function AnalyticsPage() {
   if (loading && !metrics) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex items-center space-x-2 text-slate-400 text-sm">
-          <RefreshCw className="w-4 h-4 animate-spin text-brand-500" />
+        <div className="flex items-center space-x-2 text-slate-500 text-xs font-mono">
+          <RefreshCw className="w-4 h-4 animate-spin text-indigo-600" />
           <span>Computing recovery analytics...</span>
         </div>
       </div>
@@ -48,87 +48,116 @@ export function AnalyticsPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-tight">Recovery Intelligence & Analytics</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h1 className="text-xl font-bold text-slate-900 tracking-tight">Recovery Intelligence & Analytics</h1>
+          <p className="text-xs text-slate-500 mt-0.5">
             Empirical conversion rates, strategy effectiveness, and policy gate compliance
           </p>
         </div>
         <button
           onClick={fetchAnalytics}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-medium transition self-start"
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh</span>
         </button>
       </div>
 
-      {/* KPI Cards */}
+      {/* Metrics Summary Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Total Payment Ingestion Volume</div>
-          <div className="text-2xl font-extrabold text-white font-mono">{formatINR(fin.totalVolumePaise)}</div>
-          <div className="text-[11px] text-slate-400 mt-1">{counts.totalPaymentsCount} total processed orders</div>
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <span className="text-xs text-slate-500 block mb-1">Conversion Recovery Rate</span>
+          <div className="text-2xl font-extrabold text-emerald-600 font-mono">
+            {fin.recoveryRate || 0}%
+          </div>
+          <p className="text-[11px] text-slate-500 mt-1">Recovered vs. total failed volume</p>
         </div>
 
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Recovered Gross Revenue</div>
-          <div className="text-2xl font-extrabold text-emerald-400 font-mono">{formatINR(fin.recoveredVolumePaise)}</div>
-          <div className="text-[11px] text-slate-400 mt-1">{counts.recoveredPaymentsCount} payments recovered</div>
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <span className="text-xs text-slate-500 block mb-1">Automated Policy Actions</span>
+          <div className="text-2xl font-extrabold text-indigo-600 font-mono">
+            {counts.automatedActionsCount || 0}
+          </div>
+          <p className="text-[11px] text-slate-500 mt-1">Actions executed under auto-clearance</p>
         </div>
 
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Gross Recovery Conversion Rate</div>
-          <div className="text-2xl font-extrabold text-brand-400 font-mono">{fin.recoveryRate}%</div>
-          <div className="text-[11px] text-slate-400 mt-1">From total failed payment attempts</div>
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <span className="text-xs text-slate-500 block mb-1">Human Interventions</span>
+          <div className="text-2xl font-extrabold text-amber-600 font-mono">
+            {counts.humanInterventionsCount || 0}
+          </div>
+          <p className="text-[11px] text-slate-500 mt-1">Transactions gated for review</p>
         </div>
 
-        <div className="p-4 bg-slate-900 border border-slate-800 rounded-xl">
-          <div className="text-xs text-slate-400 mb-1">Active Cases In Flight</div>
-          <div className="text-2xl font-extrabold text-amber-400 font-mono">{counts.activeRecoveryCasesCount}</div>
-          <div className="text-[11px] text-slate-400 mt-1">{counts.pendingApprovalsCount} awaiting approval</div>
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <span className="text-xs text-slate-500 block mb-1">Policy Blocks Enforced</span>
+          <div className="text-2xl font-extrabold text-rose-600 font-mono">
+            {counts.policyBlockedCount || 0}
+          </div>
+          <p className="text-[11px] text-slate-500 mt-1">Exhausted retries or fraud stops</p>
         </div>
       </div>
 
-      {/* Charts Grid */}
+      {/* Strategy Distribution & Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Daily Recovery Velocity Chart */}
-        <div className="p-5 bg-slate-900 border border-slate-800 rounded-xl">
-          <h2 className="text-sm font-semibold text-white mb-1">Daily Recovery Velocity (₹)</h2>
-          <p className="text-xs text-slate-400 mb-4">Volume comparison over time</p>
-          <div className="h-64">
+        {/* Strategy Bar Chart */}
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+          <h2 className="text-sm font-semibold text-slate-900 mb-1">Recovery Strategy Distribution</h2>
+          <p className="text-xs text-slate-500 mb-4">Volume of transactions assigned per recovery workflow</p>
+
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={metrics?.dailyTrend || []} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={11} tickLine={false} tickFormatter={(v) => `₹${v/100000}k`} />
+              <BarChart data={strategyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
-                  formatter={(val) => [`₹${(val / 100).toLocaleString('en-IN')}`, '']}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
                 />
-                <Area type="monotone" dataKey="recovered" stroke="#10b981" fill="#10b981" fillOpacity={0.25} strokeWidth={2} />
-              </AreaChart>
+                <Bar dataKey="count" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Strategy Execution Breakdown */}
-        <div className="p-5 bg-slate-900 border border-slate-800 rounded-xl">
-          <h2 className="text-sm font-semibold text-white mb-1">Strategy Execution Volume</h2>
-          <p className="text-xs text-slate-400 mb-4">Actions cleared by policy and dispatched to Razorpay</p>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={strategyChartData} layout="vertical" margin={{ top: 10, right: 20, left: 40, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" horizontal={false} />
-                <XAxis type="number" stroke="#64748b" fontSize={11} tickLine={false} />
-                <YAxis type="category" dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} width={130} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }}
-                />
-                <Bar dataKey="count" fill="#0c84eb" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+        {/* Financial Overview Card */}
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs flex flex-col justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-900 mb-1">Financial Reconciliation</h2>
+            <p className="text-xs text-slate-500 mb-4">Cumulative breakdown of intercepted volume in INR</p>
+
+            <div className="space-y-4">
+              <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-slate-500">Gross Failed Volume</div>
+                  <div className="text-lg font-bold text-slate-900 font-mono">{formatINR(fin.failedVolumePaise)}</div>
+                </div>
+                <div className="text-xs text-slate-500 font-mono">100% Volume</div>
+              </div>
+
+              <div className="p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-lg flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-indigo-900">AI Estimated Recoverable</div>
+                  <div className="text-lg font-bold text-indigo-600 font-mono">{formatINR(fin.recoverableVolumePaise)}</div>
+                </div>
+                <div className="text-xs text-indigo-600 font-mono font-bold">
+                  {fin.failedVolumePaise ? Math.round((fin.recoverableVolumePaise / fin.failedVolumePaise) * 100) : 0}% Target
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-emerald-50/50 border border-emerald-100 rounded-lg flex items-center justify-between">
+                <div>
+                  <div className="text-xs text-emerald-900">Captured / Recovered</div>
+                  <div className="text-lg font-bold text-emerald-600 font-mono">{formatINR(fin.recoveredVolumePaise)}</div>
+                </div>
+                <div className="text-xs text-emerald-700 font-mono font-bold">{fin.recoveryRate}% Realized</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-[11px] text-slate-500 pt-3 border-t border-slate-100 mt-4">
+            Financial figures reconciled to paise precision with zero rounding truncation.
           </div>
         </div>
       </div>

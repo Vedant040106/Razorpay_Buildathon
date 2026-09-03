@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/layout/Navbar.jsx';
 import { DemoSimulatorDrawer } from '../features/demo/components/DemoSimulatorDrawer.jsx';
+import { LandingPage } from '../pages/LandingPage.jsx';
 import { LoginPage } from '../features/auth/pages/LoginPage.jsx';
 import { DashboardPage } from '../features/dashboard/pages/DashboardPage.jsx';
 import { PaymentsPage } from '../features/payments/pages/PaymentsPage.jsx';
@@ -11,6 +12,41 @@ import { ApprovalsPage } from '../features/approvals/pages/ApprovalsPage.jsx';
 import { AnalyticsPage } from '../features/analytics/pages/AnalyticsPage.jsx';
 import { AuditPage } from '../features/audit/pages/AuditPage.jsx';
 import { api } from '../services/api.js';
+
+// Protected Route Guard
+function ProtectedRoute({ user, children }) {
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+// Authenticated Console Shell Layout
+function ConsoleShell({ user, pendingApprovalsCount, onOpenSimulator, onLogout, checkAuthAndCounts, children }) {
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+      {/* Console Navbar */}
+      <Navbar
+        user={user}
+        pendingApprovalsCount={pendingApprovalsCount}
+        onOpenSimulator={onOpenSimulator}
+        onLogout={onLogout}
+      />
+
+      {/* Main Console Viewport */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        {children}
+      </main>
+
+      {/* Pitch Demo Simulator Drawer */}
+      <DemoSimulatorDrawer
+        isOpen={false}
+        onClose={() => {}}
+        onRefreshData={checkAuthAndCounts}
+      />
+    </div>
+  );
+}
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -50,59 +86,168 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-400 flex items-center justify-center font-mono text-xs">
-        <span className="w-2 h-2 rounded-full bg-brand-500 animate-ping mr-2"></span>
-        <span>Initializing RecoverAI Merchant Console...</span>
+      <div className="min-h-screen bg-white text-slate-500 flex items-center justify-center font-mono text-xs">
+        <span className="w-2 h-2 rounded-full bg-indigo-600 animate-ping mr-2"></span>
+        <span>Initializing RecoverAI Platform...</span>
       </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <LoginPage 
-        onLoginSuccess={(loggedInUser) => {
-          setUser(loggedInUser);
-          checkAuthAndCounts();
-        }} 
-      />
     );
   }
 
   return (
     <Router>
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-brand-500 selection:text-white">
-        {/* Navigation Bar */}
-        <Navbar
-          user={user}
-          pendingApprovalsCount={pendingApprovalsCount}
-          onOpenSimulator={() => setIsSimulatorOpen(true)}
-          onLogout={handleLogout}
+      <Routes>
+        {/* Public Landing Page */}
+        <Route path="/" element={<LandingPage user={user} />} />
+
+        {/* Login Page */}
+        <Route 
+          path="/login" 
+          element={
+            user ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <LoginPage 
+                onLoginSuccess={(loggedInUser) => {
+                  setUser(loggedInUser);
+                  checkAuthAndCounts();
+                }} 
+              />
+            )
+          } 
         />
 
-        {/* Main Content Area */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/payments" element={<PaymentsPage />} />
-            <Route path="/recovery" element={<RecoveryQueuePage />} />
-            <Route path="/recovery/:id" element={<RecoveryCasePage />} />
-            <Route 
-              path="/approvals" 
-              element={<ApprovalsPage onApprovalUpdated={checkAuthAndCounts} />} 
-            />
-            <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/audit" element={<AuditPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+        {/* Protected Merchant Console Routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <DashboardPage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Pitch Demo Simulator Drawer */}
+        <Route
+          path="/payments"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <PaymentsPage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recovery"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <RecoveryQueuePage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recovery/:id"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <RecoveryCasePage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/approvals"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <ApprovalsPage onApprovalUpdated={checkAuthAndCounts} />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/analytics"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <AnalyticsPage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/audit"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <AuditPage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallback to Landing Page */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {/* Global Simulator Drawer mounted when active */}
+      {user && (
         <DemoSimulatorDrawer
           isOpen={isSimulatorOpen}
           onClose={() => setIsSimulatorOpen(false)}
           onRefreshData={checkAuthAndCounts}
         />
-      </div>
+      )}
     </Router>
   );
 }

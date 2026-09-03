@@ -1,22 +1,20 @@
 import { PaymentService } from './payment.service.js';
-import { createPaymentSchema, recordFailureSchema } from './payment.validation.js';
+import { createPaymentSchema, recordFailureSchema, listPaymentsQuerySchema } from './payment.validation.js';
 import { sendSuccess } from '../../utils/response.js';
 
 export class PaymentController {
   static async listPayments(req, res, next) {
     try {
-      const page = parseInt(req.query.page || '1', 10);
-      const limit = parseInt(req.query.limit || '20', 10);
-      const { status, method, failureCategory, search } = req.query;
+      const validatedQuery = listPaymentsQuerySchema.parse(req.query);
 
       const result = await PaymentService.listPayments({
         merchantId: req.user?.merchantId,
-        status,
-        method,
-        failureCategory,
-        search,
-        page,
-        limit
+        status: validatedQuery.status,
+        method: validatedQuery.method,
+        failureCategory: validatedQuery.failureCategory,
+        search: validatedQuery.search,
+        page: validatedQuery.page,
+        limit: validatedQuery.limit
       });
 
       return sendSuccess(res, result);

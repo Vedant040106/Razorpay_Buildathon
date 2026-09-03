@@ -255,6 +255,17 @@ npm run seed
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:5000`
 
+### Application Routing Architecture
+
+- `/` — Public Landing Page (Financial infrastructure overview, recovery pipeline, capabilities, safety boundary, architecture)
+- `/login` — Merchant Authentication (Sign In with demo evaluator credentials)
+- `/dashboard` — Authenticated Merchant Operations Console (Protected)
+- `/payments` — Real-Time Transaction Ledger (Protected)
+- `/recovery` — Recovery Queue & Case Inspection (Protected)
+- `/approvals` — Human-in-the-Loop Authorization Queue (Protected)
+- `/analytics` — Recovery Intelligence & Financial Metrics (Protected)
+- `/audit` — Immutable Governance Audit Ledger (Protected)
+
 ---
 
 ## Local Demo
@@ -267,6 +278,17 @@ Email: admin@recoverai.local
 Password: password123  
 
 This credential is for local/demo use only.
+
+### Environment Architecture: Local Demo vs. Production Deployment
+
+| Dimension | Local / Demo Mode | Production Deployment |
+| :--- | :--- | :--- |
+| **Database** | In-memory `MongoMemoryServer` (zero-setup fallback) | Dedicated MongoDB Replica Set / MongoDB Atlas cluster |
+| **Persistence** | Ephemeral; seeded automatically on server startup | Persistent replica set with point-in-time recovery |
+| **AI Provider** | Deterministic Fallback Classifier / Test API key | Live Gemini 1.5 Flash / OpenAI API with rate monitoring |
+| **Razorpay API** | Test Mode (`rzp_test_*`) with labeled simulations | Production Live Mode with webhooks and webhook secret |
+| **Credentials** | `admin@recoverai.local` / `password123` (demo only) | Unique merchant credentials with bcrypt & JWT secrets |
+| **Transport** | `http://localhost` (`secure: false` for dev cookies) | HTTPS enforcement (`secure: true`, strict CSP, HSTS) |
 
 ---
 
