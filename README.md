@@ -257,6 +257,19 @@ npm run seed
 
 ---
 
+## Local Demo
+
+Start the project using the documented setup commands.
+
+Demo account:
+
+Email: admin@recoverai.local  
+Password: password123  
+
+This credential is for local/demo use only.
+
+---
+
 ## 15. 5-Minute Pitch Demo
 
 RecoverAI includes a built-in pitch simulator for demonstration:

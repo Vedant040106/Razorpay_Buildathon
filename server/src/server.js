@@ -1,5 +1,6 @@
 import { createApp } from './app.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
+import { seedDatabase } from './database/seed.js';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 
@@ -8,7 +9,10 @@ async function startServer() {
     // 1. Connect to Database (local URI or embedded memory-server)
     await connectDatabase();
 
-    // 2. Initialize Express application
+    // 2. Ensure baseline data (Merchant, Admin User, Demo Cases) exists
+    await seedDatabase();
+
+    // 3. Initialize Express application
     const app = createApp();
 
     // 3. Listen on configured port
