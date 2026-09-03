@@ -1,0 +1,24 @@
+{
+  "name": "recoverai",
+  "version": "1.0.0",
+  "description": "RecoverAI — AI Revenue Recovery Agent for Razorpay AI Buildathon",
+  "author": "Vedant (https://github.com/Vedant040106)",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "start": "npm --prefix server start",
+    "test:server": "npm --prefix server test",
+    "test": "npm run test:server",
+    "seed": "npm --prefix server run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
