@@ -13,6 +13,11 @@ import { sendSuccess } from './utils/response.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import auditRoutes from './modules/audit/audit.routes.js';
 import paymentRoutes from './modules/payments/payment.routes.js';
+import recoveryRoutes from './modules/recovery/recovery.routes.js';
+import approvalRoutes from './modules/approvals/approval.routes.js';
+import analyticsRoutes from './modules/analytics/analytics.routes.js';
+import webhookRoutes from './modules/webhooks/webhook.routes.js';
+import demoRoutes from './modules/demo/demo.routes.js';
 
 export function createApp() {
   const app = express();
@@ -60,6 +65,11 @@ export function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/audit', auditRoutes);
   app.use('/api/payments', paymentRoutes);
+  app.use('/api/recovery', recoveryRoutes);
+  app.use('/api/approvals', approvalRoutes);
+  app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/webhooks', webhookRoutes);
+  app.use('/api/demo', demoRoutes);
 
   // 7. 404 Catch-all
   app.use('*', (req, res, next) => {

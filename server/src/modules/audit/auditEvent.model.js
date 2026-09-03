@@ -5,7 +5,7 @@ const actorSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['SYSTEM', 'AI_AGENT', 'USER', 'WEBHOOK']
+    enum: ['SYSTEM', 'AI_AGENT', 'USER', 'WEBHOOK', 'DEMO']
   },
   id: { type: String, default: 'system' },
   role: { type: String, default: null }
