@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Lock, Mail, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { 
+  ShieldCheck, Lock, Mail, ArrowRight, ArrowLeft, 
+  CheckCircle2, AlertCircle, RefreshCw, Eye, EyeOff 
+} from 'lucide-react';
 import { api } from '../../../services/api.js';
 import { validateLoginForm, validateEmail, validatePassword } from '../../../validation/index.js';
 
 export function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState('admin@recoverai.local');
   const [password, setPassword] = useState('password123');
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
@@ -91,7 +95,7 @@ export function LoginPage({ onLoginSuccess }) {
   const isEmailValid = touched.email && !fieldErrors.email && email.trim().length > 0;
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-indigo-500 selection:text-white animate-fadeIn">
       {/* Top navigation return */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md mb-4 px-4 sm:px-0">
         <Link
@@ -99,7 +103,7 @@ export function LoginPage({ onLoginSuccess }) {
           className="inline-flex items-center space-x-1.5 text-xs text-slate-500 hover:text-indigo-600 font-medium transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Home</span>
+          <span>Back to Landing Page</span>
         </Link>
       </div>
 
@@ -111,7 +115,7 @@ export function LoginPage({ onLoginSuccess }) {
           RecoverAI Merchant Console
         </h1>
         <p className="mt-1 text-xs text-slate-500">
-          Revenue recovery, under control.
+          Autonomous failure analysis, deterministic policy gating & Razorpay recovery
         </p>
       </div>
 
@@ -121,7 +125,7 @@ export function LoginPage({ onLoginSuccess }) {
             {serverError && (
               <div 
                 role="alert"
-                className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg flex items-center space-x-2"
+                className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg flex items-center space-x-2 animate-fadeIn"
               >
                 <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
                 <span>{serverError}</span>
@@ -159,10 +163,10 @@ export function LoginPage({ onLoginSuccess }) {
                   aria-describedby={fieldErrors.email ? "email-error" : undefined}
                   className={`block w-full pl-9 pr-3 py-2 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none transition ${
                     fieldErrors.email
-                      ? 'border-rose-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500'
+                      ? 'border-rose-400 focus:ring-2 focus:ring-rose-200 focus:border-rose-500'
                       : isEmailValid
-                      ? 'border-emerald-300 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
-                      : 'border-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                      ? 'border-emerald-300 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
+                      : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
                   }`}
                 />
               </div>
@@ -186,7 +190,7 @@ export function LoginPage({ onLoginSuccess }) {
                 <input
                   id="password-input"
                   name="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={handlePasswordChange}
                   onBlur={handlePasswordBlur}
@@ -195,12 +199,20 @@ export function LoginPage({ onLoginSuccess }) {
                   placeholder="••••••••••••"
                   aria-invalid={!!fieldErrors.password}
                   aria-describedby={fieldErrors.password ? "password-error" : undefined}
-                  className={`block w-full pl-9 pr-3 py-2 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none transition ${
+                  className={`block w-full pl-9 pr-9 py-2 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none transition ${
                     fieldErrors.password
-                      ? 'border-rose-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500'
-                      : 'border-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
+                      ? 'border-rose-400 focus:ring-2 focus:ring-rose-200 focus:border-rose-500'
+                      : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
                   }`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
               {fieldErrors.password && (
                 <p id="password-error" className="mt-1.5 text-[11px] text-rose-600 flex items-center space-x-1">
@@ -213,7 +225,7 @@ export function LoginPage({ onLoginSuccess }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-2 flex justify-center items-center space-x-2 py-2.5 px-4 rounded-lg shadow-xs text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 disabled:opacity-50 transition"
+              className="w-full mt-2 flex justify-center items-center space-x-2 py-2.5 px-4 rounded-lg shadow-xs text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 disabled:opacity-50 transition active:scale-[0.98]"
             >
               {loading ? (
                 <>
@@ -239,9 +251,9 @@ export function LoginPage({ onLoginSuccess }) {
               <button
                 type="button"
                 onClick={handleFillDemo}
-                className="text-[10px] font-mono font-semibold text-indigo-600 hover:text-indigo-800 underline"
+                className="text-[10px] font-mono font-semibold text-indigo-600 hover:text-indigo-800 underline focus:outline-none"
               >
-                Use Demo Account
+                Autofill Credentials
               </button>
             </div>
             <div className="flex items-center justify-between font-mono text-[11px]">

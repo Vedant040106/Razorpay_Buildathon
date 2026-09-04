@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart3, TrendingUp, ShieldCheck, Ban, CheckCircle2, RefreshCw } from 'lucide-react';
+import { BarChart3, TrendingUp, ShieldCheck, Ban, CheckCircle2, RefreshCw, Layers } from 'lucide-react';
 import { 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell 
 } from 'recharts';
@@ -46,7 +46,7 @@ export function AnalyticsPage() {
   }));
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
@@ -56,17 +56,19 @@ export function AnalyticsPage() {
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchAnalytics}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start"
+          disabled={loading}
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start active:scale-[0.98] disabled:opacity-60"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Refresh</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-600' : ''}`} />
+          <span>{loading ? 'Recomputing...' : 'Refresh'}</span>
         </button>
       </div>
 
       {/* Metrics Summary Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
           <span className="text-xs text-slate-500 block mb-1">Conversion Recovery Rate</span>
           <div className="text-2xl font-extrabold text-emerald-600 font-mono">
             {fin.recoveryRate || 0}%
@@ -74,7 +76,7 @@ export function AnalyticsPage() {
           <p className="text-[11px] text-slate-500 mt-1">Recovered vs. total failed volume</p>
         </div>
 
-        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
           <span className="text-xs text-slate-500 block mb-1">Automated Policy Actions</span>
           <div className="text-2xl font-extrabold text-indigo-600 font-mono">
             {counts.automatedActionsCount || 0}
@@ -82,15 +84,15 @@ export function AnalyticsPage() {
           <p className="text-[11px] text-slate-500 mt-1">Actions executed under auto-clearance</p>
         </div>
 
-        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
           <span className="text-xs text-slate-500 block mb-1">Human Interventions</span>
           <div className="text-2xl font-extrabold text-amber-600 font-mono">
             {counts.humanInterventionsCount || 0}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Transactions gated for review</p>
+          <p className="text-[11px] text-slate-500 mt-1">Transactions gated for operator review</p>
         </div>
 
-        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
           <span className="text-xs text-slate-500 block mb-1">Policy Blocks Enforced</span>
           <div className="text-2xl font-extrabold text-rose-600 font-mono">
             {counts.policyBlockedCount || 0}
@@ -99,26 +101,36 @@ export function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Strategy Distribution & Timeline */}
+      {/* Strategy Distribution & Financial Reconciliation */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Strategy Bar Chart */}
         <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
           <h2 className="text-sm font-semibold text-slate-900 mb-1">Recovery Strategy Distribution</h2>
           <p className="text-xs text-slate-500 mb-4">Volume of transactions assigned per recovery workflow</p>
 
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={strategyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
-                />
-                <Bar dataKey="count" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {strategyChartData.length === 0 ? (
+            <div className="h-64 flex flex-col items-center justify-center text-center p-6 border border-dashed border-slate-200 rounded-lg bg-slate-50/50">
+              <BarChart3 className="w-8 h-8 text-slate-300 mb-2" />
+              <span className="text-xs font-semibold text-slate-700">No strategy distribution data available</span>
+              <span className="text-[11px] text-slate-500 mt-0.5 max-w-xs">
+                Strategy metrics will populate as failed payment cases are analyzed by the recovery pipeline.
+              </span>
+            </div>
+          ) : (
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={strategyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}
+                  />
+                  <Bar dataKey="count" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {/* Financial Overview Card */}

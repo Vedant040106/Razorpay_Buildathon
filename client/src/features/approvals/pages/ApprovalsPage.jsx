@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, CheckCircle2, XCircle, RefreshCw, ArrowUpRight, AlertCircle, MessageSquare } from 'lucide-react';
+import { 
+  ShieldAlert, CheckCircle2, XCircle, RefreshCw, ArrowUpRight, 
+  AlertCircle, MessageSquare, ShieldCheck, Inbox 
+} from 'lucide-react';
 import { api } from '../../../services/api.js';
 import { formatINR, formatDate } from '../../../utils/formatters.js';
 import { Badge } from '../../../components/ui/Badge.jsx';
 import { Modal } from '../../../components/ui/Modal.jsx';
+import { EmptyState } from '../../../components/ui/EmptyState.jsx';
 import { validateApprovalForm } from '../../../validation/index.js';
 
 export function ApprovalsPage({ onApprovalUpdated }) {
@@ -16,6 +20,7 @@ export function ApprovalsPage({ onApprovalUpdated }) {
   const [notesError, setNotesError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState(null);
+  const textareaRef = useRef(null);
 
   const fetchApprovals = async () => {
     try {
@@ -39,6 +44,11 @@ export function ApprovalsPage({ onApprovalUpdated }) {
     const initialNotes = type === 'approve' ? 'Approved after merchant operator review' : '';
     setReviewNotes(initialNotes);
     setNotesError(null);
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    }, 50);
   };
 
   const handleCloseModal = () => {
@@ -75,7 +85,7 @@ export function ApprovalsPage({ onApprovalUpdated }) {
       await api.post(endpoint, { notes: reviewNotes.trim() });
       setMessage({
         type: 'success',
-        text: `Action ${actionType === 'approve' ? 'approved and dispatched' : 'rejected'} successfully.`
+        text: `Action ${actionType === 'approve' ? 'authorized and dispatched to payment gateway' : 'rejected and dropped from execution pipeline'}.`
       });
       handleCloseModal();
       await fetchApprovals();
@@ -95,51 +105,51 @@ export function ApprovalsPage({ onApprovalUpdated }) {
     : reviewNotes.trim().length >= 5 && reviewNotes.length <= 500;
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 animate-fadeIn">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Human Authorization Queue</h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Transactions gated by Policy Engine for high financial value or risk score verification
+            Operator authorization required for high-value transactions or ambiguous recovery policies
           </p>
         </div>
         <button
+          type="button"
           onClick={fetchApprovals}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start"
+          disabled={loading}
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start active:scale-[0.98] disabled:opacity-60"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          <span>Refresh</span>
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-600' : ''}`} />
+          <span>{loading ? 'Refreshing Queue...' : 'Refresh Queue'}</span>
         </button>
       </div>
 
+      {/* Notifications */}
       {message && (
-        <div 
-          role="status"
-          className={`p-3 text-xs rounded-lg border flex items-center space-x-2 ${
-            message.type === 'success' 
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-              : 'bg-rose-50 border-rose-200 text-rose-700'
+        <div
+          className={`p-3.5 rounded-lg border text-xs flex items-center space-x-2 animate-fadeIn ${
+            message.type === 'success'
+              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              : 'bg-rose-50 border-rose-200 text-rose-800'
           }`}
         >
           {message.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
+            <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
           )}
           <span>{message.text}</span>
         </div>
       )}
 
       {/* Approvals List */}
-      {approvals.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-slate-200 rounded-xl shadow-xs">
-          <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-2 opacity-90" />
-          <h2 className="text-base font-semibold text-slate-900">Approvals Queue Clear</h2>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-            All automated recovery operations are currently operating within configured policy thresholds.
-          </p>
-        </div>
+      {approvals.length === 0 && !loading ? (
+        <EmptyState
+          icon={ShieldCheck}
+          title="Approvals Queue Clear"
+          description="All automated recovery operations are currently operating within configured policy thresholds. Zero pending actions require operator sign-off."
+        />
       ) : (
         <div className="space-y-4">
           {approvals.map((appr) => {
@@ -201,15 +211,17 @@ export function ApprovalsPage({ onApprovalUpdated }) {
                     </Link>
 
                     <button
+                      type="button"
                       onClick={() => handleOpenModal(appr, 'reject')}
-                      className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg font-medium text-xs transition"
+                      className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-lg font-medium text-xs transition active:scale-[0.98]"
                     >
                       Reject Action
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => handleOpenModal(appr, 'approve')}
-                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs transition shadow-xs"
+                      className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold text-xs transition shadow-xs active:scale-[0.98]"
                     >
                       Approve & Dispatch
                     </button>
@@ -221,86 +233,98 @@ export function ApprovalsPage({ onApprovalUpdated }) {
         </div>
       )}
 
-      {/* Decision Confirmation Modal */}
-      <Modal
-        isOpen={!!selectedApproval}
-        onClose={handleCloseModal}
-        title={actionType === 'approve' ? 'Authorize Gateway Action' : 'Reject Recovery Action'}
-      >
-        <div className="space-y-4 text-xs">
-          <p className="text-slate-600 leading-relaxed">
-            {actionType === 'approve'
-              ? 'You are authorizing the execution of this recovery action. An immutable audit record will be appended to the ledger.'
-              : 'You are rejecting this action recommendation. The recovery case will be closed as unrecoverable per operator override.'}
-          </p>
-
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label htmlFor="approval-notes" className="block text-xs font-semibold text-slate-700">
-                {actionType === 'reject' ? (
-                  <span>Rejection Reason (Required) <span className="text-rose-500">*</span></span>
-                ) : (
-                  <span>Reviewer Notes (Optional)</span>
-                )}
-              </label>
-              <span className={`text-[11px] font-mono ${reviewNotes.length > 500 ? 'text-rose-600 font-bold' : 'text-slate-400'}`}>
-                {reviewNotes.length} / 500
-              </span>
+      {/* Decision Modal */}
+      {selectedApproval && (
+        <Modal
+          isOpen={Boolean(selectedApproval)}
+          onClose={handleCloseModal}
+          title={actionType === 'approve' ? 'Authorize Recovery Action' : 'Reject Recovery Action'}
+        >
+          <div className="space-y-4">
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1 font-mono">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Case ID:</span>
+                <span className="font-bold text-slate-900">{selectedApproval.caseId?.caseId}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Action:</span>
+                <span className="font-bold text-indigo-600">{selectedApproval.requestedAction}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Transaction Value:</span>
+                <span className="font-bold text-slate-900">{formatINR(selectedApproval.amountInPaise)}</span>
+              </div>
             </div>
-            <textarea
-              id="approval-notes"
-              rows={3}
-              value={reviewNotes}
-              onChange={handleNotesChange}
-              maxLength={500}
-              placeholder={actionType === 'reject' ? "Please provide a reason for rejecting this recovery action..." : "Enter optional audit notes..."}
-              aria-invalid={!!notesError}
-              aria-describedby={notesError ? "notes-error" : undefined}
-              className={`w-full p-2.5 bg-white border rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none transition font-sans ${
-                notesError
-                  ? 'border-rose-400 focus:ring-1 focus:ring-rose-500 focus:border-rose-500'
-                  : 'border-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500'
-              }`}
-            />
-            {notesError && (
-              <p id="notes-error" className="mt-1.5 text-[11px] text-rose-600 flex items-center space-x-1">
-                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                <span>{notesError}</span>
-              </p>
-            )}
-          </div>
 
-          <div className="flex justify-end space-x-2 pt-2 border-t border-slate-100">
-            <button
-              type="button"
-              onClick={handleCloseModal}
-              disabled={submitting}
-              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmitDecision}
-              disabled={submitting || !isFormValid}
-              className={`px-4 py-1.5 text-white rounded-lg text-xs font-semibold shadow-xs disabled:opacity-50 transition flex items-center space-x-1.5 ${
-                actionType === 'approve'
-                  ? 'bg-emerald-600 hover:bg-emerald-700'
-                  : 'bg-rose-600 hover:bg-rose-700'
-              }`}
-            >
-              {submitting ? (
-                <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Submitting...</span>
-                </>
-              ) : (
-                <span>{actionType === 'approve' ? 'Confirm & Execute' : 'Confirm Rejection'}</span>
-              )}
-            </button>
+            <div className="space-y-1">
+              <label 
+                htmlFor="operator-review-notes"
+                className="block text-xs font-semibold text-slate-900"
+              >
+                Operator Audit Notes {actionType === 'reject' && <span className="text-rose-600">*</span>}
+              </label>
+              <textarea
+                id="operator-review-notes"
+                ref={textareaRef}
+                rows={3}
+                value={reviewNotes}
+                maxLength={500}
+                aria-invalid={Boolean(notesError)}
+                aria-describedby={notesError ? "review-notes-error" : "review-notes-hint"}
+                onChange={handleNotesChange}
+                placeholder={
+                  actionType === 'approve'
+                    ? 'Optional notes regarding this authorization...'
+                    : 'Provide mandatory technical justification for rejection (min 5 characters)...'
+                }
+                className={`w-full p-2.5 text-xs border rounded-lg focus:outline-none transition ${
+                  notesError 
+                    ? 'border-rose-400 bg-rose-50/20 focus:ring-2 focus:ring-rose-200' 
+                    : 'border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500'
+                }`}
+              />
+              <div className="flex justify-between items-center text-[10px] text-slate-500">
+                <span id={notesError ? "review-notes-error" : "review-notes-hint"} className={notesError ? "text-rose-600 font-medium" : ""}>
+                  {notesError ? notesError : actionType === 'reject' ? 'Rejection reason will be permanently written to the immutable audit ledger.' : 'Notes will be recorded with operator identity in the audit trail.'}
+                </span>
+                <span className="font-mono text-slate-400">
+                  {reviewNotes.length} / 500
+                </span>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                disabled={submitting}
+                className="px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitDecision}
+                disabled={submitting || !isFormValid}
+                className={`px-4 py-2 text-xs font-semibold text-white rounded-lg shadow-xs transition flex items-center space-x-1.5 active:scale-[0.98] ${
+                  actionType === 'approve'
+                    ? 'bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                    : 'bg-rose-600 hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed'
+                }`}
+              >
+                {submitting && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                <span>
+                  {submitting
+                    ? 'Executing...'
+                    : actionType === 'approve'
+                    ? 'Confirm & Dispatch'
+                    : 'Confirm Rejection'}
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
-      </Modal>
+        </Modal>
+      )}
     </div>
   );
 }

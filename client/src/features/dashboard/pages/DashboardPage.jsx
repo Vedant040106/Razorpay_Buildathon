@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  TrendingUp, AlertCircle, CheckCircle2, Clock, ShieldAlert, ArrowUpRight, 
-  RefreshCw, Sparkles, Filter, CreditCard
+  TrendingUp, AlertCircle, CheckCircle2, ShieldAlert, ArrowUpRight, 
+  RefreshCw, BarChart3, Inbox
 } from 'lucide-react';
 import { 
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell 
@@ -10,15 +10,19 @@ import {
 import { api } from '../../../services/api.js';
 import { formatINR, formatDate, formatConfidence } from '../../../utils/formatters.js';
 import { Badge } from '../../../components/ui/Badge.jsx';
+import { EmptyState } from '../../../components/ui/EmptyState.jsx';
 
 export function DashboardPage() {
   const [metrics, setMetrics] = useState(null);
   const [recentCases, setRecentCases] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = async (isManual = false) => {
     try {
-      setLoading(true);
+      if (isManual) setRefreshing(true);
+      else setLoading(true);
+
       const [analyticsData, casesData] = await Promise.all([
         api.get('/analytics'),
         api.get('/recovery?limit=6')
@@ -30,6 +34,7 @@ export function DashboardPage() {
       console.error('Failed to load dashboard data:', err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -52,7 +57,7 @@ export function DashboardPage() {
   const counts = metrics?.counts || {};
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 animate-fadeIn">
       {/* Top Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
@@ -63,11 +68,13 @@ export function DashboardPage() {
         </div>
         <div className="flex items-center space-x-3">
           <button
-            onClick={fetchData}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition"
+            type="button"
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition active:scale-[0.98] disabled:opacity-60"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Refresh</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-indigo-600' : ''}`} />
+            <span>{refreshing ? 'Syncing...' : 'Refresh'}</span>
           </button>
         </div>
       </div>
@@ -89,10 +96,10 @@ export function DashboardPage() {
         </div>
 
         {/* Recoverable Opportunity */}
-        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs relative overflow-hidden">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
           <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
             <span className="font-medium">Recoverable Opportunity</span>
-            <Sparkles className="w-4 h-4 text-indigo-600" />
+            <TrendingUp className="w-4 h-4 text-indigo-600" />
           </div>
           <div className="text-2xl font-extrabold text-indigo-600 font-mono tracking-tight">
             {formatINR(financials.recoverableVolumePaise)}
@@ -103,7 +110,7 @@ export function DashboardPage() {
         </div>
 
         {/* Recovered Revenue */}
-        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
           <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
             <span className="font-medium">Successfully Recovered</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -118,7 +125,7 @@ export function DashboardPage() {
         </div>
 
         {/* Pending Approvals */}
-        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs">
+        <div className="p-5 bg-white border border-slate-200 rounded-xl shadow-xs hover:-translate-y-0.5 hover:shadow-sm transition-all duration-200">
           <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
             <span className="font-medium">Pending Human Approvals</span>
             <ShieldAlert className="w-4 h-4 text-amber-500" />
@@ -247,66 +254,83 @@ export function DashboardPage() {
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-slate-200 text-slate-500 font-medium font-mono text-[11px] bg-slate-50/70">
-                <th className="py-3 px-6">CASE ID</th>
-                <th className="py-3 px-4">AMOUNT</th>
-                <th className="py-3 px-4">FAILURE REASON</th>
-                <th className="py-3 px-4">RECOVERABILITY</th>
-                <th className="py-3 px-4">AI STRATEGY</th>
-                <th className="py-3 px-4">POLICY</th>
-                <th className="py-3 px-6 text-right">ACTION</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-mono">
-              {recentCases.map((c) => {
-                const p = c.paymentId || {};
-                const rec = c.latestDecisionId?.parsedRecommendation;
+        {recentCases.length === 0 ? (
+          <EmptyState
+            icon={Inbox}
+            title="No recent recovery activity"
+            description="Failed payment events intercepted from Razorpay webhooks will appear in this live queue."
+            action={
+              <Link
+                to="/payments"
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold border border-indigo-200 transition"
+              >
+                <span>Browse All Payments</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            }
+          />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 text-slate-500 font-medium font-mono text-[11px] bg-slate-50/70">
+                  <th className="py-3 px-6">CASE ID</th>
+                  <th className="py-3 px-4">AMOUNT</th>
+                  <th className="py-3 px-4">FAILURE REASON</th>
+                  <th className="py-3 px-4">RECOVERABILITY</th>
+                  <th className="py-3 px-4">AI STRATEGY</th>
+                  <th className="py-3 px-4">POLICY</th>
+                  <th className="py-3 px-6 text-right">ACTION</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-mono">
+                {recentCases.map((c) => {
+                  const p = c.paymentId || {};
+                  const rec = c.latestDecisionId?.parsedRecommendation;
 
-                return (
-                  <tr key={c._id} className="hover:bg-slate-50/80 transition">
-                    <td className="py-3.5 px-6 font-bold text-slate-900">
-                      {c.caseId}
-                    </td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-800">
-                      {formatINR(p.amount)}
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-600 font-sans max-w-xs truncate">
-                      {p.failureReason || p.failureCategory}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center space-x-1.5">
-                        <Badge variant={c.recoverabilityTier}>{c.recoverabilityTier || 'PENDING'}</Badge>
-                        {c.recoverabilityScore !== null && (
-                          <span className="text-[10px] text-slate-500 font-mono">({formatConfidence(c.recoverabilityScore)})</span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-700 font-sans">
-                      {rec?.recommendedStrategy?.replace(/_/g, ' ') || 'Analyzing...'}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <Badge variant={c.status === 'APPROVAL_REQUIRED' ? 'REQUIRE_APPROVAL' : c.status === 'RECOVERED' ? 'ALLOW' : c.status}>
-                        {c.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3.5 px-6 text-right">
-                      <Link
-                        to={`/recovery/${c.caseId}`}
-                        className="inline-flex items-center space-x-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
-                      >
-                        <span>Inspect</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+                  return (
+                    <tr key={c._id} className="hover:bg-slate-50/80 transition">
+                      <td className="py-3.5 px-6 font-bold text-slate-900">
+                        {c.caseId}
+                      </td>
+                      <td className="py-3.5 px-4 font-semibold text-slate-800">
+                        {formatINR(p.amount)}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-600 font-sans max-w-xs truncate">
+                        {p.failureReason || p.failureCategory}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center space-x-1.5">
+                          <Badge variant={c.recoverabilityTier}>{c.recoverabilityTier || 'PENDING'}</Badge>
+                          {c.recoverabilityScore !== null && (
+                            <span className="text-[10px] text-slate-500 font-mono">({formatConfidence(c.recoverabilityScore)})</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-700 font-sans">
+                        {rec?.recommendedStrategy?.replace(/_/g, ' ') || 'Analyzing...'}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <Badge variant={c.status === 'APPROVAL_REQUIRED' ? 'REQUIRE_APPROVAL' : c.status === 'RECOVERED' ? 'ALLOW' : c.status}>
+                          {c.status}
+                        </Badge>
+                      </td>
+                      <td className="py-3.5 px-6 text-right">
+                        <Link
+                          to={`/recovery/${c.caseId}`}
+                          className="inline-flex items-center space-x-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+                        >
+                          <span>Inspect</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

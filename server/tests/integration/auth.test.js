@@ -29,11 +29,11 @@ describe('Authentication & Authorization Lifecycle (Integration Tests)', () => {
       role: 'ADMIN',
       merchantId: testMerchant._id
     });
-  });
+  }, 30000);
 
   afterAll(async () => {
     await disconnectDatabase();
-  });
+  }, 30000);
 
   test('1. Successful login returns 200, JWT token, user profile, and HTTP-only cookie', async () => {
     const res = await request(app)

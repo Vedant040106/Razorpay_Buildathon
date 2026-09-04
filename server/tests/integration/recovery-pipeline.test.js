@@ -49,11 +49,11 @@ describe('RecoverAI End-to-End Recovery Pipeline (Integration Tests)', () => {
       .send({ email: 'admin_test@test.local', password: 'password123' });
 
     authToken = loginRes.body.data.token;
-  });
+  }, 30000);
 
   afterAll(async () => {
     await disconnectDatabase();
-  });
+  }, 30000);
 
   test('1. Ingest failed payment and automatically generate recovery case', async () => {
     const paymentRes = await request(app)

@@ -1,8 +1,9 @@
 import React from 'react';
 import { 
   BrainCircuit, ShieldAlert, UserCheck, Lock, 
-  Cpu, FileSearch, CheckCircle2, ChevronRight 
+  Cpu, FileSearch 
 } from 'lucide-react';
+import { ScrollReveal } from './ScrollReveal.jsx';
 
 export function FeatureSection() {
   const features = [
@@ -55,42 +56,58 @@ export function FeatureSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest font-mono">
-            Platform Capabilities
-          </span>
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
-            Engineered for Financial Control
-          </h2>
-          <p className="text-sm text-slate-600 mt-2">
-            Designed as robust financial infrastructure. RecoverAI replaces unstructured heuristics with verifiable, repeatable recovery logic.
-          </p>
-        </div>
+        <ScrollReveal animation="fade-up" duration={600}>
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-bold text-indigo-600 uppercase tracking-widest font-mono">
+              Platform Capabilities
+            </span>
+            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
+              Financial Rigor Meets Machine Intelligence
+            </h2>
+            <p className="text-sm text-slate-600 mt-2">
+              Six foundational safeguards engineered to eliminate operational risk while maximizing recovered transaction volume.
+            </p>
+          </div>
+        </ScrollReveal>
 
-        {/* 6 Features Grid */}
+        {/* Feature Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feat) => {
-            const Icon = feat.icon;
+          {features.map((f, idx) => {
+            const Icon = f.icon;
+            const staggerDelay = (idx % 3) * 80 + Math.floor(idx / 3) * 100;
             return (
-              <div
-                key={feat.id}
-                className="p-6 bg-slate-50/70 border border-slate-200 rounded-xl hover:bg-white hover:border-indigo-200 hover:shadow-sm transition flex flex-col justify-between"
+              <ScrollReveal
+                key={f.id}
+                animation="fade-up"
+                delay={staggerDelay}
+                duration={550}
+                className="h-full"
               >
-                <div>
-                  <div className="w-10 h-10 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 mb-4">
-                    <Icon className="w-5 h-5" />
+                <div className="h-full p-6 bg-slate-50 border border-slate-200 rounded-2xl hover:border-indigo-300 hover:bg-white hover:-translate-y-1 transition-all duration-200 shadow-xs flex flex-col justify-between group">
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 group-hover:scale-105 transition-transform duration-200">
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-white text-slate-600 border border-slate-200">
+                        {f.technicalBadge}
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-bold text-slate-900 mb-2">
+                      {f.title}
+                    </h3>
+                    
+                    <p className="text-xs text-slate-600 leading-relaxed">
+                      {f.desc}
+                    </p>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 mb-2">{feat.title}</h3>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    {feat.desc}
-                  </p>
+                  
+                  <div className="mt-6 pt-3 border-t border-slate-200/60 flex items-center text-xs font-semibold text-indigo-600 group-hover:text-indigo-700">
+                    <span className="font-mono text-[11px]">System Guarantee Active</span>
+                  </div>
                 </div>
-                <div className="mt-5 pt-3 border-t border-slate-200/60 flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-semibold text-indigo-700 bg-indigo-50/80 px-2 py-0.5 rounded border border-indigo-100">
-                    {feat.technicalBadge}
-                  </span>
-                </div>
-              </div>
+              </ScrollReveal>
             );
           })}
         </div>
