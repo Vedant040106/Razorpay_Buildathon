@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { RotateCcw, Filter, ArrowUpRight, RefreshCw, AlertTriangle, ShieldCheck, Inbox } from 'lucide-react';
+import { RotateCcw, Filter, ArrowUpRight, RefreshCw, AlertTriangle, ShieldCheck, Inbox, Activity, FlaskConical } from 'lucide-react';
 import { api } from '../../../services/api.js';
 import { formatINR, formatConfidence, formatDate } from '../../../utils/formatters.js';
 import { Badge } from '../../../components/ui/Badge.jsx';
@@ -49,15 +49,31 @@ export function RecoveryQueuePage() {
             Active failed transactions categorized by recoverability feasibility and policy clearance
           </p>
         </div>
-        <button
-          type="button"
-          onClick={fetchCases}
-          disabled={loading}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition self-start active:scale-[0.98] disabled:opacity-60"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-600' : ''}`} />
-          <span>{loading ? 'Scanning Queue...' : 'Refresh Queue'}</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <Link
+            to="/recovery/command-center"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold shadow-2xs transition active:scale-[0.98]"
+          >
+            <Activity className="w-3.5 h-3.5 text-indigo-600" />
+            <span>Command Center</span>
+          </Link>
+          <Link
+            to="/recovery/lab"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-lg text-xs font-semibold shadow-2xs transition active:scale-[0.98]"
+          >
+            <FlaskConical className="w-3.5 h-3.5 text-purple-600" />
+            <span>Recovery Lab</span>
+          </Link>
+          <button
+            type="button"
+            onClick={fetchCases}
+            disabled={loading}
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-medium shadow-2xs transition active:scale-[0.98] disabled:opacity-60"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-600' : ''}`} />
+            <span>{loading ? 'Scanning...' : 'Refresh'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs */}

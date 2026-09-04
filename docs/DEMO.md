@@ -5,11 +5,12 @@
 | Time Interval | Section | Focus & Demonstration |
 | :--- | :--- | :--- |
 | **0:00 – 0:30** | **The Problem** | Why treating all failed payments equally destroys revenue and customer trust. |
-| **0:30 – 1:15** | **Merchant Console** | High-density dashboard: Total Failed GMV, Recoverable GMV, Recovery Rate (%). |
-| **1:15 – 2:15** | **AI Recovery Case** | Deep dive into a real case: Payment context, AI recommendation, confidence meter, policy gate check. |
-| **2:15 – 3:15** | **Action Execution** | Permitted action execution through the Policy Engine & Idempotency Gate; instant audit log emission. |
-| **3:15 – 4:15** | **Controlled Failure** | Live trigger of AI outage or Gateway failure: Graceful fallback, zero crashes, safe human routing. |
-| **4:15 – 5:00** | **Architecture & Impact** | Modular monolith design, strict AI isolation, financial math, measurable recovery metrics. |
+| **0:30 – 1:15** | **Recovery Command Center** | Live orchestration pipeline (8 stages), real-time KPIs, multi-dimensional failure intelligence. |
+| **1:15 – 2:00** | **Recovery Lab Sandbox** | Zero-mutation policy experimentation, real-time projections, and formal governance proposals. |
+| **2:00 – 3:00** | **8-Stage Recovery Timeline** | Deep dive into a real case: AI recommendations separated from deterministic policy/idempotency gates. |
+| **3:00 – 3:45** | **Action Execution** | Permitted action execution through the Policy Engine & Idempotency Gate; instant audit log emission. |
+| **3:45 – 4:30** | **Controlled Failure** | Live trigger of AI outage or Gateway failure: Graceful fallback, zero crashes, safe human routing. |
+| **4:30 – 5:00** | **Architecture & Impact** | Modular monolith design, strict AI isolation, financial math, measurable recovery metrics. |
 
 ---
 
@@ -23,30 +24,49 @@
 
 ---
 
-### Scene 2: The Merchant Console (0:30 - 1:15)
-1. Navigate to `http://localhost:5173` (Logged in as `admin@recoverai.local`).
-2. Point to the **Top Metric Ribbon**:
-   - **Total Failed Volume:** ₹4,85,000 across 42 transactions.
-   - **Recoverable Opportunity:** ₹3,12,000 (64.3%).
-   - **Recovered to Date:** ₹1,88,500 (60.4% conversion).
-   - **Pending Approvals:** 3 critical cases awaiting review.
-3. Show the **Recovery Trends Chart** and **Failure Category Breakdown** (Transient Network vs. Insufficient Funds vs. Authentication Drop-offs).
+### Scene 2: Recovery Command Center (0:30 - 1:15)
+1. Navigate to `/recovery/command-center` (or click **Command Center** in the navbar).
+2. Point out the **Live Orchestration Funnel**:
+   - Interactive 8-stage visualization from Payment Ingestion to Audit Ledger Persistence.
+   - Click each node to show stage authority rules (e.g. AI is advisory, Policy Engine is authoritative).
+3. Showcase the **8 Deterministic KPI Cards**:
+   - Gross Failed GMV vs Recovered GMV in paise precision.
+   - Active Recovery Yield (%) and In-Flight Recoverable Volume.
+   - Idempotency Gate Blocks (0 double-charges guaranteed).
+4. Highlight the **Multi-Dimensional Failure Intelligence Matrix**:
+   - Failure categories (Bank Downtime vs Network Timeout vs Customer Drop-off) with empirical recovery success rates.
+   - Payment method breakdown (UPI, Cards, Netbanking).
 
 ---
 
-### Scene 3: Deep AI Recovery Case Analysis (1:15 - 2:15)
-1. Open the **Recovery Queue** tab.
-2. Select **Case A: `REC-2026-90412`** (Amount: ₹4,500, Failure: `GATEWAY_ERROR`).
-3. Show the **Payment Context Panel**: Customer HDFC card, 1 attempt, transient timeout.
-4. Highlight the **AI Decision Card**:
-   - Strategy: `RETRY_PAYMENT`
-   - Confidence Score: `0.92` (High)
-   - Decision Rationale: *"Failure pattern indicates temporary gateway timeout during issuer communication. No prior customer decline recorded."*
-5. Show the **Visual Policy Gate Pipeline**:
-   - Payment State: Not yet captured (PASS)
-   - Retry Count: 1/3 (PASS)
-   - Value Threshold: ₹4,500 <= ₹5,000 auto-limit (PASS)
-   - Decision: **ALLOW** (`WITHIN_RECOVERY_POLICY`)
+### Scene 3: Recovery Lab Policy Sandbox (1:15 - 2:00)
+1. Navigate to `/recovery/lab` (or click **Recovery Lab** in the navbar).
+2. Emphasize the **Persistent Zero-Mutation Safety Banner**:
+   > *"Simulation complete. No payments were modified. No recovery actions were executed. No Razorpay API mutation was performed."*
+3. Adjust policy controls interactively:
+   - Increase Cooldown Window from 15 mins to 30 mins (allowing banking switch downtime to resolve).
+   - Increase Max Attempts from 3 to 4.
+   - Set Strategy Focus to `BALANCED`.
+4. Point out the **Real-Time Financial Projections**:
+   - Projected Recovery Rate change (e.g. +4.2% lift).
+   - Incremental Recovered Volume (₹54,000 delta).
+   - Approval Queue friction shift.
+5. Click **"Submit Policy Proposal"** to demonstrate formal governance:
+   - Enter proposal rationale and create reviewable proposal (`PROP-2026-XXXXX`).
+   - Show proposal in the governance review ledger.
+
+---
+
+### Scene 4: 8-Stage Recovery Decision Timeline (2:00 - 3:00)
+1. Open **Recovery Queue** (`/recovery`) and select **Case `REC-2026-90412`** (Amount: ₹4,500).
+2. Highlight the full **8-Stage Decision Timeline**:
+   - **Stage 1 & 2**: Payment Failed & Failure Classified (Deterministic).
+   - **Stage 3**: AI Advisory Recommendation (Gemini 1.5 Pro / Fallback, Confidence 0.92, Strategy `RETRY_PAYMENT`).
+   - **Stage 4**: Deterministic Policy Gate (Rules `POL-001` through `POL-004` evaluated).
+   - **Stage 5**: Idempotency Check (SHA-256 Lock Key generated).
+   - **Stage 6 & 7**: Recovery Action Dispatched & Execution Outcome Verified.
+   - **Stage 8**: Audit Recorded (Cryptographically chained to previous event).
+3. Expand stage telemetry payloads to demonstrate full transparency.
 
 ---
 

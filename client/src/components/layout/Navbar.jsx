@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { 
   LayoutDashboard, CreditCard, RotateCcw, ShieldCheck, 
-  BarChart3, History, Play, LogOut, ExternalLink, Menu, X 
+  BarChart3, History, Play, LogOut, ExternalLink, Menu, X,
+  Activity, FlaskConical
 } from 'lucide-react';
 
 export function Navbar({ pendingApprovalsCount = 0, onOpenSimulator, onLogout, user }) {
@@ -10,8 +11,10 @@ export function Navbar({ pendingApprovalsCount = 0, onOpenSimulator, onLogout, u
 
   const navItems = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/recovery/command-center', label: 'Command Center', icon: Activity },
     { to: '/payments', label: 'Payments', icon: CreditCard },
-    { to: '/recovery', label: 'Recovery Queue', icon: RotateCcw },
+    { to: '/recovery', label: 'Queue', icon: RotateCcw },
+    { to: '/recovery/lab', label: 'Recovery Lab', icon: FlaskConical },
     { 
       to: '/approvals', 
       label: 'Approvals', 

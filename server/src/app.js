@@ -18,6 +18,7 @@ import approvalRoutes from './modules/approvals/approval.routes.js';
 import analyticsRoutes from './modules/analytics/analytics.routes.js';
 import webhookRoutes from './modules/webhooks/webhook.routes.js';
 import demoRoutes from './modules/demo/demo.routes.js';
+import recoveryLabRoutes from './modules/recoveryLab/recoveryLab.routes.js';
 
 export function createApp() {
   const app = express();
@@ -76,6 +77,7 @@ export function createApp() {
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/webhooks', webhookRoutes);
   app.use('/api/demo', demoRoutes);
+  app.use('/api/recovery-lab', recoveryLabRoutes);
 
   // 7. 404 Catch-all
   app.use('*', (req, res, next) => {

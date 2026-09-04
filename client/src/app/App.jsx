@@ -8,6 +8,8 @@ import { DashboardPage } from '../features/dashboard/pages/DashboardPage.jsx';
 import { PaymentsPage } from '../features/payments/pages/PaymentsPage.jsx';
 import { RecoveryQueuePage } from '../features/recovery/pages/RecoveryQueuePage.jsx';
 import { RecoveryCasePage } from '../features/recovery/pages/RecoveryCasePage.jsx';
+import { RecoveryCommandCenterPage } from '../features/recovery/pages/RecoveryCommandCenterPage.jsx';
+import { RecoveryLabPage } from '../features/recovery/pages/RecoveryLabPage.jsx';
 import { ApprovalsPage } from '../features/approvals/pages/ApprovalsPage.jsx';
 import { AnalyticsPage } from '../features/analytics/pages/AnalyticsPage.jsx';
 import { AuditPage } from '../features/audit/pages/AuditPage.jsx';
@@ -163,6 +165,40 @@ export default function App() {
                 checkAuthAndCounts={checkAuthAndCounts}
               >
                 <RecoveryQueuePage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recovery/command-center"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <RecoveryCommandCenterPage />
+              </ConsoleShell>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/recovery/lab"
+          element={
+            <ProtectedRoute user={user}>
+              <ConsoleShell
+                user={user}
+                pendingApprovalsCount={pendingApprovalsCount}
+                onOpenSimulator={() => setIsSimulatorOpen(true)}
+                onLogout={handleLogout}
+                checkAuthAndCounts={checkAuthAndCounts}
+              >
+                <RecoveryLabPage />
               </ConsoleShell>
             </ProtectedRoute>
           }

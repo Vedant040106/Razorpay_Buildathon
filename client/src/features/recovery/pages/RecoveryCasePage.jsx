@@ -7,6 +7,7 @@ import {
 import { api } from '../../../services/api.js';
 import { formatINR, formatDate, formatConfidence, formatStrategyName } from '../../../utils/formatters.js';
 import { Badge } from '../../../components/ui/Badge.jsx';
+import { RecoveryTimeline } from '../components/RecoveryTimeline.jsx';
 
 export function RecoveryCasePage() {
   const { id } = useParams();
@@ -145,6 +146,9 @@ export function RecoveryCasePage() {
           <span>{error}</span>
         </div>
       )}
+
+      {/* 8-Stage Decision Timeline (Separating AI Recommendation vs Deterministic Execution) */}
+      <RecoveryTimeline stages={caseData.decisionTimeline || []} />
 
       {/* 2-Column Grid: Left (Payment Context + Failure + Timeline), Right (AI + Policy + Action Gate) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

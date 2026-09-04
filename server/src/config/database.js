@@ -27,8 +27,13 @@ export async function connectDatabase() {
   // 2. Fallback to MongoMemoryServer for zero-setup demo/test mode
   try {
     logger.info('Initializing embedded MongoMemoryServer for zero-setup execution...');
+    process.env.MONGOMS_MD5_CHECK = 'false';
     const { MongoMemoryServer } = await import('mongodb-memory-server');
-    mongodInstance = await MongoMemoryServer.create();
+    mongodInstance = await MongoMemoryServer.create({
+      binary: {
+        checkMD5: false
+      }
+    });
     const memoryUri = mongodInstance.getUri();
     
     await mongoose.connect(memoryUri);

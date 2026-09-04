@@ -48,8 +48,22 @@ RecoverAI introduces an intelligent, autonomous-yet-governed revenue recovery pi
 
 ---
 
-## 4. Key Features
+## 4. Key Features & Flagship Capabilities
 
+### 🌟 Flagship Differentiation Capabilities
+1. **Recovery Command Center (`/recovery/command-center`):**
+   - Real-time operational dashboard featuring 8 deterministic financial KPIs (paise precision).
+   - Interactive visual **8-stage orchestration funnel** mapping transaction progress from ingestion to audit sealing.
+   - Multi-dimensional failure intelligence matrix correlating failure categories and payment methods to empirical recovery yields.
+2. **Recovery Lab & Policy Governance Engine (`/recovery/lab`):**
+   - Zero-mutation policy simulation sandbox evaluating cooldown windows (5-180m), retry attempt caps (1-10), high-value approval thresholds (₹1 - ₹5,00,000), and strategy biases (`BALANCED`, `AGGRESSIVE`, `CONSERVATIVE`) against real historical failed payments.
+   - **Zero-Mutation Invariance:** Strictly read-only against live payment states and external Razorpay APIs.
+   - Formal policy proposal workflow (`PROP-2026-XXXXX`) establishing reviewable governance from sandbox to production activation.
+3. **8-Stage Recovery Decision Timeline (`/recovery/:id`):**
+   - Granular milestone visualization explicitly separating probabilistic AI recommendations (advisory) from deterministic policy and idempotency gates (authoritative).
+   - Expandable cryptographic telemetry, failure context, and audit chain verification for every transaction.
+
+### Core System Attributes
 - **Merchant Operations Console:** Data-dense financial operations interface built with React, Vite, and Tailwind CSS.
 - **Strict Separation of Concerns:** *AI recommends. Deterministic systems authorize and execute.*
 - **Dual AI Engine:** Supports Gemini API / OpenAI API with an automatic, zero-dependency Deterministic Fallback Classifier during outages.

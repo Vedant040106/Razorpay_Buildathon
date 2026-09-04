@@ -22,6 +22,15 @@ export class RecoveryController {
     }
   }
 
+  static async getCommandCenter(req, res, next) {
+    try {
+      const result = await RecoveryService.getCommandCenterMetrics(req.user?.merchantId);
+      return sendSuccess(res, result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async getCase(req, res, next) {
     try {
       const { id } = caseIdParamSchema.parse(req.params);

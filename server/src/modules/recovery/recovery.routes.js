@@ -8,6 +8,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', RecoveryController.listCases);
+router.get('/command-center', RecoveryController.getCommandCenter);
 router.get('/:id', RecoveryController.getCase);
 router.post('/:id/analyze', authorize('ADMIN', 'OPS_MANAGER'), RecoveryController.analyzeCase);
 
