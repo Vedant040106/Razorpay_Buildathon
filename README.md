@@ -359,5 +359,5 @@ Real engineering failures encountered during implementation and their resolution
 
 ## 22. Team & Author
 
-- **Author:** Vedant ([@Vedant040106](https://github.com/Vedant040106))
+- **Author:** Vedant Sandeep Angre ([@Vedant040106](https://github.com/Vedant040106))
 - **Repository:** [https://github.com/Vedant040106/Razorpay_Buildathon](https://github.com/Vedant040106/Razorpay_Buildathon)
