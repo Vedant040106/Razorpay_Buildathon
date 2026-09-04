@@ -26,7 +26,7 @@ export class PaymentController {
   static async getPayment(req, res, next) {
     try {
       const { id } = req.params;
-      const payment = await PaymentService.getPaymentById(id);
+      const payment = await PaymentService.getPaymentById(id, req.user?.merchantId);
       return sendSuccess(res, { payment });
     } catch (err) {
       next(err);
@@ -51,7 +51,7 @@ export class PaymentController {
     try {
       const { id } = req.params;
       const validatedData = recordFailureSchema.parse(req.body);
-      const result = await PaymentService.recordPaymentFailure(id, validatedData, req.id);
+      const result = await PaymentService.recordPaymentFailure(id, validatedData, req.id, req.user?.merchantId);
       return sendSuccess(res, result);
     } catch (err) {
       next(err);

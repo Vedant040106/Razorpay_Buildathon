@@ -67,6 +67,16 @@ const auditEventSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Mixed,
     default: () => ({})
   },
+  prevHash: {
+    type: String,
+    default: null,
+    index: true
+  },
+  hash: {
+    type: String,
+    default: null,
+    index: true
+  },
   timestamp: {
     type: Date,
     default: Date.now,

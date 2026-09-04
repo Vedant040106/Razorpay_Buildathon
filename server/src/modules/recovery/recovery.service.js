@@ -59,11 +59,15 @@ export class RecoveryService {
   /**
    * Full Recovery Pipeline execution: AI Analysis -> Policy Evaluation -> Action Gate.
    */
-  static async processRecoveryCase(caseId, options = {}, actor = { type: 'SYSTEM', id: 'recovery_orchestrator' }, requestId = null) {
+  static async processRecoveryCase(caseId, options = {}, actor = { type: 'SYSTEM', id: 'recovery_orchestrator' }, requestId = null, merchantId = null) {
     const isObjectId = mongoose.isValidObjectId(caseId);
-    const recoveryCase = await RecoveryCase.findOne({
+    const query = {
       $or: isObjectId ? [{ _id: caseId }, { caseId: String(caseId) }] : [{ caseId: String(caseId) }]
-    }).populate('paymentId').populate('merchantId');
+    };
+    if (merchantId) {
+      query.merchantId = merchantId;
+    }
+    const recoveryCase = await RecoveryCase.findOne(query).populate('paymentId').populate('merchantId');
 
     if (!recoveryCase) {
       throw new NotFoundError(`Recovery Case ${caseId} not found.`);
@@ -160,11 +164,15 @@ export class RecoveryService {
   /**
    * Retrieves comprehensive details of a single recovery case including audit timeline.
    */
-  static async getCaseDetail(caseIdentifier) {
+  static async getCaseDetail(caseIdentifier, merchantId = null) {
     const isObjectId = mongoose.isValidObjectId(caseIdentifier);
     const query = isObjectId
       ? { $or: [{ _id: caseIdentifier }, { caseId: String(caseIdentifier) }] }
       : { caseId: String(caseIdentifier) };
+
+    if (merchantId) {
+      query.merchantId = merchantId;
+    }
 
     const recoveryCase = await RecoveryCase.findOne(query)
       .populate('paymentId')

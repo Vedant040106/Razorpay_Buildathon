@@ -27,3 +27,31 @@ export const authLimiter = rateLimit({
     }
   }
 });
+
+export const aiSimulationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60, // Limit heavy AI and simulation calculations
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'SIMULATION_RATE_LIMIT_EXCEEDED',
+      message: 'Too many simulation or analysis requests. Please try again after 15 minutes.'
+    }
+  }
+});
+
+export const webhookLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5000, // Generous capacity to never drop legitimate Razorpay webhook deliveries
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: 'WEBHOOK_RATE_LIMIT_EXCEEDED',
+      message: 'Webhook burst threshold exceeded.'
+    }
+  }
+});

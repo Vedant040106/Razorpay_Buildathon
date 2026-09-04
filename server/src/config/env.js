@@ -38,3 +38,10 @@ export const env = {
   COOLDOWN_PERIOD_MINUTES: parseInt(process.env.COOLDOWN_PERIOD_MINUTES || '15', 10),
   MIN_CONFIDENCE_AUTO_ACTION: parseFloat(process.env.MIN_CONFIDENCE_AUTO_ACTION || '0.75')
 };
+
+// Validate critical security constraints in production
+if (env.NODE_ENV === 'production') {
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32 || process.env.JWT_SECRET.includes('recoverai_dev_jwt_secret')) {
+    throw new Error('SECURITY FATAL: In production, JWT_SECRET must be explicitly configured with at least 32 characters and cannot use default dev secret.');
+  }
+}

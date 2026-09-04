@@ -6,6 +6,7 @@ import { RecoveryCase } from '../recovery/recoveryCase.model.js';
 import { RecoveryService } from '../recovery/recovery.service.js';
 import { PaymentService } from '../payments/payment.service.js';
 import { AuditService } from '../audit/audit.service.js';
+import { AuditEvent } from '../audit/auditEvent.model.js';
 import { logger } from '../../utils/logger.js';
 import { BadRequestError, UnauthorizedError } from '../../utils/errors.js';
 
@@ -26,9 +27,13 @@ export class WebhookService {
     }
 
     // If placeholder secret configured in dev, allow signature pass with warning
-    if (secret.includes('placeholder') && process.env.NODE_ENV !== 'production') {
+    if (secret && secret.includes('placeholder') && process.env.NODE_ENV !== 'production') {
       logger.warn('[WEBHOOK] Webhook secret is placeholder; skipping cryptographic validation in dev mode.');
       return true;
+    }
+
+    if (!secret) {
+      throw new UnauthorizedError('Webhook secret is not configured.');
     }
 
     const expectedSignature = crypto
@@ -36,10 +41,14 @@ export class WebhookService {
       .update(rawBody)
       .digest('hex');
 
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(expectedSignature, 'utf8'),
-      Buffer.from(signature, 'utf8')
-    );
+    const expectedBuf = Buffer.from(expectedSignature, 'utf8');
+    const signatureBuf = Buffer.from(String(signature), 'utf8');
+
+    if (expectedBuf.length !== signatureBuf.length) {
+      throw new UnauthorizedError('Invalid cryptographic webhook signature.');
+    }
+
+    const isValid = crypto.timingSafeEqual(expectedBuf, signatureBuf);
 
     if (!isValid) {
       throw new UnauthorizedError('Invalid cryptographic webhook signature.');
@@ -55,8 +64,15 @@ export class WebhookService {
     const eventId = eventPayload.id || `evt_${Date.now()}`;
     const eventName = eventPayload.event;
 
-    // 1. Idempotency Check: Prevent duplicate webhook replay attacks
-    if (processedWebhooks.has(eventId)) {
+    // 1. Idempotency Check: Prevent duplicate webhook replay attacks (L1 in-memory + L2 database)
+    const isCached = processedWebhooks.has(eventId);
+    let isPersistedDuplicate = false;
+    if (!isCached) {
+      const existingAudit = await AuditEvent.findOne({ entityType: 'WEBHOOK', entityId: eventId }).lean();
+      if (existingAudit) isPersistedDuplicate = true;
+    }
+
+    if (isCached || isPersistedDuplicate) {
       logger.warn(`[WEBHOOK] Duplicate webhook event detected: ${eventId} (${eventName}). Dropping.`);
       await AuditService.logEvent({
         eventType: 'WEBHOOK_DUPLICATE_DROPPED',
@@ -69,6 +85,11 @@ export class WebhookService {
       return { status: 'DUPLICATE_DROPPED', eventId };
     }
 
+    // Manage in-memory cache size (bounded at 10,000 to prevent memory leaks)
+    if (processedWebhooks.size > 10000) {
+      const firstItem = processedWebhooks.values().next().value;
+      processedWebhooks.delete(firstItem);
+    }
     processedWebhooks.add(eventId);
 
     await AuditService.logEvent({

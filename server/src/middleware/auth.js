@@ -19,7 +19,7 @@ export function authenticate(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(token, env.JWT_SECRET);
+    const decoded = jwt.verify(token, env.JWT_SECRET, { algorithms: ['HS256'] });
     req.user = decoded; // { id, email, role, merchantId }
     next();
   } catch (err) {

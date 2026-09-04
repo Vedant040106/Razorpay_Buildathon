@@ -34,7 +34,7 @@ export class RecoveryController {
   static async getCase(req, res, next) {
     try {
       const { id } = caseIdParamSchema.parse(req.params);
-      const caseDetail = await RecoveryService.getCaseDetail(id);
+      const caseDetail = await RecoveryService.getCaseDetail(id, req.user?.merchantId);
       return sendSuccess(res, { recoveryCase: caseDetail });
     } catch (err) {
       next(err);
@@ -50,7 +50,8 @@ export class RecoveryController {
         id,
         options,
         { type: 'USER', id: req.user.id, role: req.user.role },
-        req.id
+        req.id,
+        req.user?.merchantId
       );
 
       return sendSuccess(res, result, 200, {

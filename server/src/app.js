@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import { requestIdMiddleware } from './middleware/requestId.js';
-import { standardLimiter } from './middleware/rateLimiter.js';
+import { standardLimiter, aiSimulationLimiter, webhookLimiter } from './middleware/rateLimiter.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { NotFoundError } from './utils/errors.js';
 import { sendSuccess } from './utils/response.js';
@@ -54,8 +54,14 @@ export function createApp() {
     app.use(morgan(':method :url :status :res[content-length] - :response-time ms [req: :req[x-request-id]]'));
   }
 
-  // 4. Rate Limiting
-  app.use('/api', standardLimiter);
+  // 4. Rate Limiting (protect AI and simulation from abuse, exempt webhooks from standard user limiter)
+  app.use('/api/webhooks', webhookLimiter);
+  app.use('/api/recovery/:id/analyze', aiSimulationLimiter);
+  app.use('/api/recovery-lab/simulate', aiSimulationLimiter);
+  app.use('/api', (req, res, next) => {
+    if (req.path.startsWith('/webhooks')) return next();
+    return standardLimiter(req, res, next);
+  });
 
   // 5. System Health Check Endpoint
   app.get('/api/health', (req, res) => {

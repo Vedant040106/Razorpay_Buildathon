@@ -307,6 +307,12 @@ export class RecoverySimulationService {
       throw new NotFoundError(`Policy Proposal ${proposalId} not found.`);
     }
 
+    if (user?.merchantId && proposal.merchantId) {
+      if (proposal.merchantId.toString() !== user.merchantId.toString()) {
+        throw new NotFoundError(`Policy Proposal ${proposalId} not found.`);
+      }
+    }
+
     if (proposal.status !== 'PENDING_REVIEW') {
       throw new BadRequestError(`Cannot approve proposal that is already ${proposal.status}.`);
     }
@@ -356,6 +362,12 @@ export class RecoverySimulationService {
 
     if (!proposal) {
       throw new NotFoundError(`Policy Proposal ${proposalId} not found.`);
+    }
+
+    if (user?.merchantId && proposal.merchantId) {
+      if (proposal.merchantId.toString() !== user.merchantId.toString()) {
+        throw new NotFoundError(`Policy Proposal ${proposalId} not found.`);
+      }
     }
 
     if (proposal.status !== 'PENDING_REVIEW') {

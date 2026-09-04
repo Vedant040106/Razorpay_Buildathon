@@ -39,8 +39,10 @@ export class PaymentService {
   /**
    * Records a failed payment attempt and triggers the recovery pipeline.
    */
-  static async recordPaymentFailure(paymentId, failureData, requestId = null) {
-    const payment = await Payment.findOne({ paymentId });
+  static async recordPaymentFailure(paymentId, failureData, requestId = null, merchantId = null) {
+    const query = { paymentId };
+    if (merchantId) query.merchantId = merchantId;
+    const payment = await Payment.findOne(query);
     if (!payment) {
       throw new NotFoundError(`Payment ${paymentId} not found`);
     }
@@ -134,11 +136,12 @@ export class PaymentService {
     if (method) query.method = method;
     if (failureCategory) query.failureCategory = failureCategory;
     if (search) {
+      const sanitizedSearch = String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       query.$or = [
-        { paymentId: { $regex: search, $options: 'i' } },
-        { orderId: { $regex: search, $options: 'i' } },
-        { 'customer.email': { $regex: search, $options: 'i' } },
-        { 'customer.name': { $regex: search, $options: 'i' } }
+        { paymentId: { $regex: sanitizedSearch, $options: 'i' } },
+        { orderId: { $regex: sanitizedSearch, $options: 'i' } },
+        { 'customer.email': { $regex: sanitizedSearch, $options: 'i' } },
+        { 'customer.name': { $regex: sanitizedSearch, $options: 'i' } }
       ];
     }
 
@@ -159,8 +162,10 @@ export class PaymentService {
   /**
    * Fetches deep payment record with attempts and recovery case details.
    */
-  static async getPaymentById(paymentId) {
-    const payment = await Payment.findOne({ paymentId }).populate('merchantId').lean();
+  static async getPaymentById(paymentId, merchantId = null) {
+    const query = { paymentId };
+    if (merchantId) query.merchantId = merchantId;
+    const payment = await Payment.findOne(query).populate('merchantId').lean();
     if (!payment) {
       throw new NotFoundError(`Payment ${paymentId} not found`);
     }

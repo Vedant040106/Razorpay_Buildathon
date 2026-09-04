@@ -9,9 +9,14 @@ export class ApprovalService {
   /**
    * Lists approvals pending human review.
    */
-  static async listApprovals({ status = 'PENDING', page = 1, limit = 20 }) {
+  static async listApprovals({ merchantId = null, status = 'PENDING', page = 1, limit = 20 }) {
     const query = {};
     if (status) query.status = status;
+
+    if (merchantId) {
+      const cases = await RecoveryCase.find({ merchantId }).select('_id').lean();
+      query.caseId = { $in: cases.map(c => c._id) };
+    }
 
     const skip = (page - 1) * limit;
     const [approvals, total] = await Promise.all([
@@ -43,6 +48,12 @@ export class ApprovalService {
     const approval = await Approval.findById(approvalId).populate('caseId').populate('actionId');
     if (!approval) {
       throw new NotFoundError(`Approval ticket ${approvalId} not found.`);
+    }
+
+    if (user?.merchantId && approval.caseId?.merchantId) {
+      if (approval.caseId.merchantId.toString() !== user.merchantId.toString()) {
+        throw new NotFoundError(`Approval ticket ${approvalId} not found.`);
+      }
     }
 
     if (approval.status !== 'PENDING') {
@@ -91,6 +102,12 @@ export class ApprovalService {
     const approval = await Approval.findById(approvalId).populate('caseId').populate('actionId');
     if (!approval) {
       throw new NotFoundError(`Approval ticket ${approvalId} not found.`);
+    }
+
+    if (user?.merchantId && approval.caseId?.merchantId) {
+      if (approval.caseId.merchantId.toString() !== user.merchantId.toString()) {
+        throw new NotFoundError(`Approval ticket ${approvalId} not found.`);
+      }
     }
 
     if (approval.status !== 'PENDING') {

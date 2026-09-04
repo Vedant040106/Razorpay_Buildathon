@@ -10,12 +10,17 @@ import { RecoveryService } from '../recovery/recovery.service.js';
 import { WebhookService } from '../webhooks/webhook.service.js';
 import { ActionService } from '../actions/action.service.js';
 import { logger } from '../../utils/logger.js';
+import { ForbiddenError } from '../../utils/errors.js';
 
 export class DemoService {
   /**
    * Resets and populates fresh baseline seed data.
    */
   static async resetBaseline(merchantId) {
+    if (process.env.NODE_ENV === 'production' && process.env.ALLOW_DEMO_RESET !== 'true') {
+      throw new ForbiddenError('Demo database reset is permanently disabled in production environments.');
+    }
+
     logger.info('[DEMO] Resetting demo data to baseline state...');
     await Promise.all([
       Payment.deleteMany({}),

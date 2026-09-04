@@ -5,6 +5,7 @@ import { authenticate } from '../../middleware/auth.js';
 const router = Router();
 
 router.use(authenticate);
+router.get('/verify', AuditController.verifyLedger);
 router.get('/', AuditController.listEvents);
 router.get('/timeline/:entityId', AuditController.getEntityTimeline);
 

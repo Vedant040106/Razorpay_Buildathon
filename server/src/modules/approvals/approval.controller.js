@@ -8,6 +8,7 @@ export class ApprovalController {
       const validatedQuery = approvalQuerySchema.parse(req.query);
 
       const result = await ApprovalService.listApprovals({ 
+        merchantId: req.user?.merchantId,
         status: validatedQuery.status, 
         page: validatedQuery.page, 
         limit: validatedQuery.limit 
